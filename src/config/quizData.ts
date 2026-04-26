@@ -1,5 +1,3 @@
-import { Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, Moon, TrendingUp, ShieldCheck } from 'lucide-react';
-
 export const QUIZ_PHASES = [
   { id: 1, label: 'PERFIL' },
   { id: 2, label: 'HÁBITOS' },

@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import preact from '@preact/preset-vite'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [preact()],
   build: {
     target: 'es2020',
     minify: 'terser',
@@ -10,18 +10,14 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
+        passes: 3,
       },
     },
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react-dom') || id.includes('/react/')) {
-              return 'vendor-react';
-            }
-            if (id.includes('lucide-react') || id.includes('sonner')) {
-              return 'vendor-ui';
-            }
+            if (id.includes('sonner') || id.includes('preact')) return 'vendor-preact';
           }
         },
       },
@@ -29,5 +25,6 @@ export default defineConfig({
     cssCodeSplit: true,
     sourcemap: false,
     reportCompressedSize: false,
+    modulePreload: { polyfill: false },
   },
 })

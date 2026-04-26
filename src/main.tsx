@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom/client';
+import { render } from 'preact';
 import { Toaster } from 'sonner';
 import QuizApp from './QuizApp';
 import { captureReferral } from './lib/referral';
@@ -11,9 +11,14 @@ if ('requestIdleCallback' in window) {
   setTimeout(captureReferral, 1);
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+// Remove static HTML shell after Preact mounts
+const shell = document.getElementById('app-shell');
+if (shell) shell.remove();
+
+render(
   <>
     <Toaster position="top-center" richColors />
     <QuizApp />
   </>,
+  document.getElementById('root')!
 );

@@ -1,5 +1,22 @@
-import { useState } from 'react';
-import { Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, TrendingUp, ShieldCheck, ArrowRight, CheckCircle2, Lock, Crown, Phone } from 'lucide-react';
+import { useState } from 'preact/hooks';
+// Inline SVG icons — replaces lucide-react (~38KB savings)
+function IconFilm(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="7" x2="7" y1="3" y2="21"/><line x1="17" x2="17" y1="3" y2="21"/><line x1="3" x2="7" y1="8" y2="8"/><line x1="17" x2="21" y1="8" y2="8"/><line x1="3" x2="7" y1="16" y2="16"/><line x1="17" x2="21" y1="16" y2="16"/></svg>}
+function IconStar(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
+function IconArrowRight(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>}
+function IconCheckCircle(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>}
+function IconLock(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>}
+function IconCrown(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg>}
+function IconPhone(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>}
+function IconShieldCheck(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>}
+function IconSparkles(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>}
+function IconBrain(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>}
+function IconTarget(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>}
+function IconZap(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>}
+function IconHeart(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>}
+function IconClock(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
+function IconTv(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
+function IconCoffee(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>}
+function IconTrendingUp(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>}
 // Standalone quiz — no react-router-dom navigation needed
 import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, PRICING_PLANS } from './config/quizData';
 // Lazy imports — Supabase is only needed after quiz completion
@@ -8,9 +25,9 @@ const edgeFunctionPromise = import('./lib/edgeFunction').then(m => m.invokeEdgeF
 import { toast } from 'sonner';
 import { getReferralCode } from './lib/referral';
 
-// Map string icon names to actual Lucide components
+// Map string icon names to inline SVG components
 const IconMap: Record<string, any> = {
-  Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, TrendingUp, ShieldCheck
+  Brain: IconBrain, Target: IconTarget, Zap: IconZap, Heart: IconHeart, Clock: IconClock, Star: IconStar, Film: IconFilm, Tv: IconTv, Coffee: IconCoffee, TrendingUp: IconTrendingUp, ShieldCheck: IconShieldCheck
 };
 
 // ──────── PROFILE SCORING ALGORITHM ────────
@@ -443,7 +460,7 @@ export default function QuizApp() {
         {/* Header / Logo */}
         <div className="flex justify-between items-center mb-4 sm:mb-8">
           <div className="flex items-center gap-2">
-            <Film className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
+            <IconFilm className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
             <span className="text-xl sm:text-2xl font-bold tracking-tight">MrCine<span className="text-purple-500">PRO</span></span>
           </div>
           <button
@@ -461,7 +478,7 @@ export default function QuizApp() {
               className="animate-fade-in-up flex-1 flex flex-col items-center justify-start text-center mt-2 sm:mt-10"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-purple-500/10 text-purple-400 text-xs sm:text-sm font-medium mb-3 sm:mb-6 border border-purple-500/20">
-                <SparklesIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <IconSparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                 Descubra seu Perfil Cinematográfico
               </div>
 
@@ -482,7 +499,7 @@ export default function QuizApp() {
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-white">Mariana S.</p>
                       <div className="flex text-amber-400">
-                        {[1,2,3,4,5].map(i => <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
+                        {[1,2,3,4,5].map(i => <IconStar key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
                       </div>
                     </div>
                   </div>
@@ -495,7 +512,7 @@ export default function QuizApp() {
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-white">Rafael C.</p>
                       <div className="flex text-amber-400">
-                        {[1,2,3,4,5].map(i => <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
+                        {[1,2,3,4,5].map(i => <IconStar key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
                       </div>
                     </div>
                   </div>
@@ -508,7 +525,7 @@ export default function QuizApp() {
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-white">Lucas M.</p>
                       <div className="flex text-amber-400">
-                        {[1,2,3,4,5].map(i => <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
+                        {[1,2,3,4,5].map(i => <IconStar key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
                       </div>
                     </div>
                   </div>
@@ -522,7 +539,7 @@ export default function QuizApp() {
                   onClick={handleStart}
                   className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3.5 sm:py-4 px-8 rounded-2xl text-base sm:text-lg transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_0_40px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2"
                 >
-                  Começar Agora <ArrowRight className="w-5 h-5" />
+                  Começar Agora <IconArrowRight className="w-5 h-5" />
                 </button>
                 <a
                   href="https://mrcine.pro/login"
@@ -570,7 +587,7 @@ export default function QuizApp() {
                     /* WhatsApp input with phone icon and formatting */
                     <div className="relative">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                        <Phone className="w-5 h-5" />
+                        <IconPhone className="w-5 h-5" />
                       </div>
                       <input
                         type="tel"
@@ -640,7 +657,7 @@ export default function QuizApp() {
                           <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${
                             isSelected ? 'border-purple-500 bg-purple-500' : 'border-gray-600'
                           }`}>
-                            {isSelected && <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-white" />}
+                            {isSelected && <IconCheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />}
                           </div>
                         </button>
                       );
@@ -717,7 +734,7 @@ export default function QuizApp() {
               {profileMovies.length > 0 && (
                 <div className="mb-6 sm:mb-8">
                   <h3 className="text-sm sm:text-lg font-bold mb-3 sm:mb-4 flex items-center gap-2">
-                    <Film className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                    <IconFilm className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
                     Filmes selecionados para você
                   </h3>
                   <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -779,7 +796,7 @@ export default function QuizApp() {
               className="animate-fade-in-up flex-1 flex flex-col items-center justify-center text-center pb-6 sm:pb-10"
             >
               <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_40px_rgba(168,85,247,0.3)] mb-4 sm:mb-6">
-                <Lock className="w-7 h-7 sm:w-9 sm:h-9 text-white" />
+                <IconLock className="w-7 h-7 sm:w-9 sm:h-9 text-white" />
               </div>
 
               <h2 className="text-xl sm:text-3xl font-bold mb-2">Crie sua conta</h2>
@@ -828,7 +845,7 @@ export default function QuizApp() {
                     </>
                   ) : (
                     <>
-                      Criar Conta e Continuar <ArrowRight className="w-5 h-5" />
+                      Criar Conta e Continuar <IconArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </button>
@@ -852,7 +869,7 @@ export default function QuizApp() {
 
                 {/* Real Urgency - NO fake timer */}
                 <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-medium text-xs sm:text-sm">
-                  <Crown className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
+                  <IconCrown className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
                   Preço de lançamento válido para os primeiros {EARLY_BIRD_LIMIT} usuários
                 </div>
               </div>
@@ -890,7 +907,7 @@ export default function QuizApp() {
                     <div className={`absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                       selectedPlan === plan.id ? 'border-purple-500 bg-purple-500' : 'border-gray-600'
                     }`}>
-                      {selectedPlan === plan.id && <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-white" />}
+                      {selectedPlan === plan.id && <IconCheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />}
                     </div>
                   </div>
                 ))}
@@ -906,7 +923,7 @@ export default function QuizApp() {
 
               {/* Guarantee & Trust */}
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 flex items-start gap-3 sm:gap-4">
-                <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 shrink-0" />
+                <IconShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 shrink-0" />
                 <div>
                   <h4 className="font-bold text-sm sm:text-base mb-1">Garantia de 7 Dias</h4>
                   <p className="text-gray-400 text-xs sm:text-sm">
@@ -916,7 +933,7 @@ export default function QuizApp() {
               </div>
 
               <div className="mt-4 sm:mt-6 flex justify-center items-center gap-2 text-gray-500 text-xs sm:text-sm">
-                <Lock className="w-3 h-3 sm:w-4 sm:h-4" /> Pagamento 100% Seguro via Stripe
+                <IconLock className="w-3 h-3 sm:w-4 sm:h-4" /> Pagamento 100% Seguro via Stripe
               </div>
             </div>
           )}
@@ -925,14 +942,3 @@ export default function QuizApp() {
   );
 }
 
-function SparklesIcon(props: any) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-      <path d="M5 3v4" />
-      <path d="M19 17v4" />
-      <path d="M3 5h4" />
-      <path d="M17 19h4" />
-    </svg>
-  );
-}
