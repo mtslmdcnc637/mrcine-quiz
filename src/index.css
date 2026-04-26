@@ -6,6 +6,15 @@
   body {
     @apply bg-[#0a0a0a] text-white antialiased;
   }
+  /* Prevent layout shift for root */
+  #root {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer utilities {

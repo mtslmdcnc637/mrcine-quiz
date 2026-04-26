@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, Moon, TrendingUp, ShieldCheck, ArrowRight, CheckCircle2, Lock, Crown, Phone } from 'lucide-react';
+import { Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, TrendingUp, ShieldCheck, ArrowRight, CheckCircle2, Lock, Crown, Phone } from 'lucide-react';
 // Standalone quiz — no react-router-dom navigation needed
 import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, PRICING_PLANS } from './config/quizData';
 import { supabase } from './lib/supabase';
@@ -13,7 +13,7 @@ import { getReferralCode } from './lib/referral';
 
 // Map string icon names to actual Lucide components
 const IconMap: Record<string, any> = {
-  Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, Moon, TrendingUp, ShieldCheck
+  Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, TrendingUp, ShieldCheck
 };
 
 // ──────── PROFILE SCORING ALGORITHM ────────
@@ -747,6 +747,10 @@ export default function QuizApp() {
                         <img
                           src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                           alt={movie.title}
+                          width="300"
+                          height="450"
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2">
