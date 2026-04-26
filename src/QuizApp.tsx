@@ -378,9 +378,9 @@ export default function QuizApp() {
 
                 <div className="bg-white/5 border border-white/10 p-4 sm:p-5 rounded-2xl mb-3 sm:mb-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <img src="/avatar-rafael.png" alt="Rafael C." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
+                    <img src="/avatar-rafael.jpeg" alt="Camila R." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
                     <div>
-                      <p className="font-bold text-xs sm:text-sm text-white">Rafael C.</p>
+                      <p className="font-bold text-xs sm:text-sm text-white">Camila R.</p>
                       <div className="flex text-amber-400">
                         {[1,2,3,4,5].map(i => <IconStar key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />)}
                       </div>
