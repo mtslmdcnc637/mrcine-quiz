@@ -17,13 +17,24 @@ function IconClock(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox=
 function IconTv(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
 function IconCoffee(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>}
 function IconTrendingUp(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>}
-// Standalone quiz — no react-router-dom navigation needed
+
 import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, PRICING_PLANS } from './config/quizData';
-// Lazy imports — Supabase is only needed after quiz completion
-const supabasePromise = import('./lib/supabase').then(m => m.supabase);
-const edgeFunctionPromise = import('./lib/edgeFunction').then(m => m.invokeEdgeFunction);
-import { toast } from 'sonner';
+// Custom lightweight toast — replaces Sonner + @preact/compat (~15KB+ savings)
+import { toast } from './lib/toast';
 import { getReferralCode } from './lib/referral';
+
+// Deferred lazy imports — Supabase is only needed after quiz completion
+// Created on first use, NOT at module level, to avoid early chunk fetching
+let _supabasePromise: Promise<any> | null = null;
+let _edgeFunctionPromise: Promise<any> | null = null;
+function getSupabase() {
+  if (!_supabasePromise) _supabasePromise = import('./lib/supabase').then(m => m.supabase);
+  return _supabasePromise;
+}
+function getEdgeFunction() {
+  if (!_edgeFunctionPromise) _edgeFunctionPromise = import('./lib/edgeFunction').then(m => m.invokeEdgeFunction);
+  return _edgeFunctionPromise;
+}
 
 // Map string icon names to inline SVG components
 const IconMap: Record<string, any> = {
@@ -95,7 +106,6 @@ const PROFILES: Record<string, CinematographicProfile> = {
 function calculateProfile(answers: Record<string, any>): CinematographicProfile {
   const scores: Record<string, number> = {};
 
-  // Goal-based scoring
   const goalMap: Record<string, string> = {
     relax: 'maratonador-felipe',
     learn: 'cinefilo-contemplativo',
@@ -106,7 +116,6 @@ function calculateProfile(answers: Record<string, any>): CinematographicProfile 
     scores[goalMap[answers.goal]] = (scores[goalMap[answers.goal]] || 0) + 3;
   }
 
-  // Genre-based scoring
   const genreMap: Record<string, string[]> = {
     action: ['aventureiro-noturno'],
     scifi: ['aventureiro-noturno', 'explorador-criativo'],
@@ -123,131 +132,72 @@ function calculateProfile(answers: Record<string, any>): CinematographicProfile 
     });
   });
 
-  // Era preference
-  if (answers.era === 'classics') {
-    scores['cinefilo-contemplativo'] = (scores['cinefilo-contemplativo'] || 0) + 2;
-  }
-
-  // Format preference
-  if (answers.format === 'series') {
-    scores['maratonador-felipe'] = (scores['maratonador-felipe'] || 0) + 1;
-  }
-
-  // Time of day
-  if (answers.time === 'latenight') {
-    scores['aventureiro-noturno'] = (scores['aventureiro-noturno'] || 0) + 2;
-  }
-
-  // Frustrations
-  if (answers.struggle === 'time_lost') {
-    scores['maratonador-felipe'] = (scores['maratonador-felipe'] || 0) + 1;
-  }
-  if (answers.struggle === 'where') {
-    scores['critico-de-sofa'] = (scores['critico-de-sofa'] || 0) + 1;
-  }
-
-  // Plot twists
+  if (answers.era === 'classics') scores['cinefilo-contemplativo'] = (scores['cinefilo-contemplativo'] || 0) + 2;
+  if (answers.format === 'series') scores['maratonador-felipe'] = (scores['maratonador-felipe'] || 0) + 1;
+  if (answers.time === 'latenight') scores['aventureiro-noturno'] = (scores['aventureiro-noturno'] || 0) + 2;
+  if (answers.struggle === 'time_lost') scores['maratonador-felipe'] = (scores['maratonador-felipe'] || 0) + 1;
+  if (answers.struggle === 'where') scores['critico-de-sofa'] = (scores['critico-de-sofa'] || 0) + 1;
   if (answers.plot_twists === 'love') {
     scores['aventureiro-noturno'] = (scores['aventureiro-noturno'] || 0) + 1;
     scores['critico-de-sofa'] = (scores['critico-de-sofa'] || 0) + 1;
   }
-
-  // Recommendations
   if (answers.recommendations === 'research') {
     scores['critico-de-sofa'] = (scores['critico-de-sofa'] || 0) + 1;
     scores['cinefilo-contemplativo'] = (scores['cinefilo-contemplativo'] || 0) + 1;
   }
 
-  // Find the highest scoring profile
   let maxScore = 0;
   let bestProfile = 'maratonador-felipe';
-
   for (const [profile, score] of Object.entries(scores)) {
-    if (score > maxScore) {
-      maxScore = score;
-      bestProfile = profile;
-    }
+    if (score > maxScore) { maxScore = score; bestProfile = profile; }
   }
-
   return PROFILES[bestProfile];
 }
 
 // ──────── WHATSAPP VALIDATION (BR) ────────
-
-/**
- * Formats and validates Brazilian phone numbers.
- * Accepts formats: (11) 99999-9999, 11999999999, +55 11 99999-9999, etc.
- * Returns { formatted, digits, isValid }
- */
 function formatWhatsApp(value: string): { formatted: string; digits: string; isValid: boolean } {
-  // Strip everything except digits
   const digits = value.replace(/\D/g, '');
-
-  // Remove leading +55 or 55 if present
   const national = digits.startsWith('55') ? digits.slice(2) : digits;
-
-  // Format as (XX) XXXXX-XXXX or (XX) XXXX-XXXX
   let formatted = '';
-  if (national.length === 0) {
-    formatted = '';
-  } else if (national.length <= 2) {
-    formatted = `(${national}`;
-  } else if (national.length <= 7) {
-    formatted = `(${national.slice(0, 2)}) ${national.slice(2)}`;
-  } else {
-    formatted = `(${national.slice(0, 2)}) ${national.slice(2, 7)}-${national.slice(7, 11)}`;
-  }
-
-  // Valid BR mobile: 11 digits starting with a valid DDD (not 00) and 9 after DDD
-  const isValid = national.length === 11
-    && /^[1-9]{2}9\d{8}$/.test(national);
-
+  if (national.length === 0) formatted = '';
+  else if (national.length <= 2) formatted = `(${national}`;
+  else if (national.length <= 7) formatted = `(${national.slice(0, 2)}) ${national.slice(2)}`;
+  else formatted = `(${national.slice(0, 2)}) ${national.slice(2, 7)}-${national.slice(7, 11)}`;
+  const isValid = national.length === 11 && /^[1-9]{2}9\d{8}$/.test(national);
   return { formatted, digits: national, isValid };
 }
 
-// TMDB fetch via Supabase Edge Function (tmdb-proxy)
-// tmdb-proxy has verify_jwt = false, so it works with just the apikey header.
-// No user session is required.
+// TMDB fetch via Supabase Edge Function
 async function fetchProfileMovies(params: Record<string, string>): Promise<any[]> {
   try {
-    const [supabase, invokeEdgeFunction] = await Promise.all([supabasePromise, edgeFunctionPromise]);
+    const [supabase, invokeEdgeFunction] = await Promise.all([getSupabase(), getEdgeFunction()]);
     if (!supabase) return [];
-
     const data = await invokeEdgeFunction<{ results?: any[] }>('tmdb-proxy', {
       endpoint: 'discover/movie',
       params: { language: 'pt-BR', ...params },
     });
     return data?.results || [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
-// Save quiz progress to Supabase (for analytics / future dashboard)
+// Save quiz progress to Supabase
 async function saveQuizProgress(answers: Record<string, any>, currentStep: number, completed: boolean) {
   try {
-    const supabase = await supabasePromise;
+    const supabase = await getSupabase();
     if (!supabase) return;
-    await supabase
-      .from('quiz_responses')
-      .insert({
-        name: answers.name || null,
-        email: answers.email || null,
-        whatsapp: answers.whatsapp || null,
-        profile_type: completed ? calculateProfile(answers).name : null,
-        answers: answers,
-        last_step: currentStep,
-        completed: completed,
-      });
-  } catch {
-    // Silently fail — this is analytics, not critical
-  }
+    await supabase.from('quiz_responses').insert({
+      name: answers.name || null,
+      email: answers.email || null,
+      whatsapp: answers.whatsapp || null,
+      profile_type: completed ? calculateProfile(answers).name : null,
+      answers, last_step: currentStep, completed,
+    });
+  } catch { /* analytics only */ }
 }
 
 type QuizStep = 'start' | 'question' | 'loading' | 'result' | 'signup' | 'pricing';
 
 export default function QuizApp() {
-  // Standalone: no navigate, use window.location.href for redirects
   const [step, setStep] = useState<QuizStep>('start');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -257,165 +207,100 @@ export default function QuizApp() {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [signupPassword, setSignupPassword] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
-
-  // Profile result
   const [profileResult, setProfileResult] = useState<CinematographicProfile | null>(null);
   const [profileMovies, setProfileMovies] = useState<any[]>([]);
 
-  // Removed fake timer — using real urgency instead
-  const EARLY_BIRD_LIMIT = 100;
-
   const handleStart = () => setStep('question');
-
-  const handleAnswer = (questionId: string, value: any) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
-  };
+  const handleAnswer = (questionId: string, value: any) => setAnswers(prev => ({ ...prev, [questionId]: value }));
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
-      // Save progress for analytics (which step they reached)
       saveQuizProgress(answers, nextIndex, false);
-    } else {
-      startLoading();
-    }
+    } else { startLoading(); }
   };
 
   const startLoading = async () => {
     setStep('loading');
-    // Save completed quiz
     saveQuizProgress(answers, QUIZ_QUESTIONS.length, true);
-
     let progress = 0;
     const interval = setInterval(() => {
       progress += 2;
       setLoadingProgress(progress);
-
-      if (progress % 20 === 0) {
-        setLoadingTextIndex(prev => Math.min(prev + 1, LOADING_TEXTS.length - 1));
-      }
-
+      if (progress % 20 === 0) setLoadingTextIndex(prev => Math.min(prev + 1, LOADING_TEXTS.length - 1));
       if (progress >= 100) {
         clearInterval(interval);
-        // Calculate profile
         const profile = calculateProfile(answers);
         setProfileResult(profile);
-
-        // Fetch movies for the profile
-        fetchProfileMovies(profile.discoverParams).then(movies => {
-          setProfileMovies(movies.slice(0, 6));
-        });
-
+        fetchProfileMovies(profile.discoverParams).then(movies => setProfileMovies(movies.slice(0, 6)));
         setTimeout(() => setStep('result'), 500);
       }
     }, 60);
   };
 
-  // Handle account creation on the signup step
   const handleSignUp = async () => {
-    if (!answers.email) {
-      toast.error('E-mail não encontrado. Refaça o quiz.');
-      return;
-    }
-    if (signupPassword.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres.');
-      return;
-    }
+    if (!answers.email) { toast.error('E-mail não encontrado. Refaça o quiz.'); return; }
+    if (signupPassword.length < 6) { toast.error('A senha deve ter pelo menos 6 caracteres.'); return; }
     setIsSigningUp(true);
     try {
-      const supabase = await supabasePromise;
-      // Inline signUpWithEmail
+      const supabase = await getSupabase();
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: answers.email,
-        password: signupPassword,
+        email: answers.email, password: signupPassword,
         options: { data: { username: answers.name || 'Usuário' } }
       });
       if (signUpError) throw signUpError;
       if (signUpData.user) {
         await supabase.from('profiles').upsert({ id: signUpData.user.id, username: answers.name || 'Usuário', xp: 0, level: 1 });
       }
-      // Wait for session to be established (works because mailer_autoconfirm = true)
       await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Check if we have a session now
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         toast.success('Conta criada com sucesso!');
-        // Go to pricing page
         setStep('pricing');
       } else {
-        // Email already exists — sign in instead
         try {
           await supabase.auth.signInWithPassword({ email: answers.email, password: signupPassword });
           await new Promise(resolve => setTimeout(resolve, 1000));
           const { data: { session: retrySession } } = await supabase.auth.getSession();
-          if (retrySession) {
-            toast.success('Login realizado!');
-            setStep('pricing');
-          } else {
-            toast.error('Não foi possível fazer login. Tente novamente.');
-          }
+          if (retrySession) { toast.success('Login realizado!'); setStep('pricing'); }
+          else { toast.error('Não foi possível fazer login. Tente novamente.'); }
         } catch {
-          toast.error('Este e-mail já está cadastrado com outra senha. Faça login manualmente.', { duration: 5000 });
+          toast.error('Este e-mail já está cadastrado com outra senha. Faça login manualmente.');
           window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
         }
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao criar conta';
-      toast.error(message, { duration: 5000 });
-    } finally {
-      setIsSigningUp(false);
-    }
+      toast.error(message);
+    } finally { setIsSigningUp(false); }
   };
 
   const handleSubscribe = async (planId: string) => {
     setIsSubscribing(true);
     try {
-      const [supabase, invokeEdgeFunction] = await Promise.all([supabasePromise, edgeFunctionPromise]);
-      // Force-refresh session to avoid 401 on edge function
-      try {
-        await supabase.auth.refreshSession();
-      } catch {
-        // Ignore — invokeEdgeFunction will handle token refresh internally
-      }
-
+      const [supabase, invokeEdgeFunction] = await Promise.all([getSupabase(), getEdgeFunction()]);
+      try { await supabase.auth.refreshSession(); } catch { /* ignore */ }
       const { data: { session } } = await supabase.auth.getSession();
-
       if (!session) {
-        // Should not happen since signup step creates a session,
-        // but handle gracefully just in case
-        toast.error('Sessão expirada. Faça login novamente.', { duration: 6000 });
+        toast.error('Sessão expirada. Faça login novamente.');
         window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
-        setIsSubscribing(false);
-        return;
+        setIsSubscribing(false); return;
       }
-
       const data = await invokeEdgeFunction<{ url?: string }>('stripe-checkout', {
-        plan_id: planId,
-        user_id: session.user.id,
+        plan_id: planId, user_id: session.user.id,
         user_email: session.user.email || answers.email,
         ref_code: getReferralCode() || undefined,
       });
-
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        console.error('[QuizApp handleSubscribe] No URL returned from stripe-checkout');
-        throw new Error('URL de checkout não retornada');
-      }
+      if (data?.url) { window.location.href = data.url; }
+      else { throw new Error('URL de checkout não retornada'); }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao processar assinatura';
-      console.error('[QuizApp handleSubscribe] Error:', message);
       if (message.includes('401') || message.includes('Authentication failed') || message.includes('Session expired')) {
-        toast.error('Sessão expirada. Faça login novamente.', { duration: 6000 });
+        toast.error('Sessão expirada. Faça login novamente.');
         window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
-      } else {
-        toast.error(message, { duration: 6000 });
-      }
-    } finally {
-      setIsSubscribing(false);
-    }
+      } else { toast.error(message); }
+    } finally { setIsSubscribing(false); }
   };
 
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
@@ -423,24 +308,18 @@ export default function QuizApp() {
 
   const isNextDisabled = () => {
     if (!currentAnswer) return true;
-    if (currentQuestion.type === 'multiple' && currentQuestion.min) {
-      return currentAnswer.length < currentQuestion.min;
-    }
+    if (currentQuestion.type === 'multiple' && currentQuestion.min) return currentAnswer.length < currentQuestion.min;
     if (currentQuestion.type === 'input') {
-      // WhatsApp field is optional — only validate if something was typed
       if (currentQuestion.id === 'whatsapp') {
         if (!currentAnswer || currentAnswer.replace(/\D/g, '').length === 0) return false;
-        const { isValid } = formatWhatsApp(currentAnswer);
-        return !isValid;
+        return !formatWhatsApp(currentAnswer).isValid;
       }
       return currentAnswer.trim().length < 2;
     }
     return false;
   };
 
-  // WhatsApp input display value
   const [whatsappDisplay, setWhatsappDisplay] = useState('');
-
   const handleWhatsAppChange = (value: string) => {
     const { formatted, digits } = formatWhatsApp(value);
     setWhatsappDisplay(formatted);
@@ -449,10 +328,10 @@ export default function QuizApp() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans overflow-x-hidden relative selection:bg-purple-500/30">
-      {/* Background Ambient */}
+      {/* Background Ambient — radial-gradient instead of blur (massive paint savings on mobile) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-purple-900/20 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-fuchsia-900/10 blur-[100px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full" style={{background:'radial-gradient(ellipse,rgba(88,28,135,0.25) 0%,transparent 70%)'}} />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full" style={{background:'radial-gradient(ellipse,rgba(112,26,117,0.12) 0%,transparent 70%)'}} />
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8 min-h-screen flex flex-col">
@@ -473,10 +352,7 @@ export default function QuizApp() {
 
           {/* START SCREEN */}
           {step === 'start' && (
-            <div
-              key="start"
-              className="animate-fade-in-up flex-1 flex flex-col items-center justify-start text-center mt-2 sm:mt-10"
-            >
+            <div key="start" className="animate-fade-in-up flex-1 flex flex-col items-center justify-start text-center mt-2 sm:mt-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-purple-500/10 text-purple-400 text-xs sm:text-sm font-medium mb-3 sm:mb-6 border border-purple-500/20">
                 <IconSparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                 Descubra seu Perfil Cinematográfico
@@ -554,10 +430,7 @@ export default function QuizApp() {
 
           {/* QUESTION SCREEN */}
           {step === 'question' && (
-            <div
-              key={`q-${currentQuestionIndex}`}
-              className="animate-fade-in-right flex-1 flex flex-col"
-            >
+            <div key={`q-${currentQuestionIndex}`} className="animate-fade-in-right flex-1 flex flex-col">
               {/* Progress Bar */}
               <div className="mb-4 sm:mb-10">
                 <div className="flex justify-between text-[10px] sm:text-xs font-medium text-gray-500 mb-2 sm:mb-3">
@@ -584,7 +457,6 @@ export default function QuizApp() {
               <div className="flex-1 mt-3 sm:mt-6">
                 {currentQuestion.type === 'input' ? (
                   currentQuestion.id === 'whatsapp' ? (
-                    /* WhatsApp input with phone icon and formatting */
                     <div className="relative">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                         <IconPhone className="w-5 h-5" />
@@ -598,14 +470,10 @@ export default function QuizApp() {
                         autoFocus
                       />
                       {answers.whatsapp && answers.whatsapp.length > 0 && !formatWhatsApp(answers.whatsapp).isValid && (
-                        <p className="text-amber-400 text-xs mt-2 ml-1">
-                          Digite um número válido: DDD + 9 + 8 dígitos
-                        </p>
+                        <p className="text-amber-400 text-xs mt-2 ml-1">Digite um número válido: DDD + 9 + 8 dígitos</p>
                       )}
                       {answers.whatsapp && formatWhatsApp(answers.whatsapp).isValid && (
-                        <p className="text-green-400 text-xs mt-2 ml-1">
-                          Número válido!
-                        </p>
+                        <p className="text-green-400 text-xs mt-2 ml-1">Número válido!</p>
                       )}
                     </div>
                   ) : (
@@ -624,9 +492,7 @@ export default function QuizApp() {
                       const isSelected = currentQuestion.type === 'multiple'
                         ? (currentAnswer || []).includes(option.id)
                         : currentAnswer === option.id;
-
                       const Icon = option.icon ? IconMap[option.icon] : null;
-
                       return (
                         <button
                           key={option.id}
@@ -684,10 +550,7 @@ export default function QuizApp() {
 
           {/* LOADING SCREEN */}
           {step === 'loading' && (
-            <div
-              key="loading"
-              className="animate-fade-in flex-1 flex flex-col items-center justify-center text-center"
-            >
+            <div key="loading" className="animate-fade-in flex-1 flex flex-col items-center justify-center text-center">
               <div className="relative w-24 h-24 sm:w-32 sm:h-32 mb-6 sm:mb-8">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="45" fill="none" stroke="#1f2937" strokeWidth="4" />
@@ -702,12 +565,8 @@ export default function QuizApp() {
                   <span className="text-2xl sm:text-3xl font-bold text-white">{loadingProgress}%</span>
                 </div>
               </div>
-
               <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Criando seu perfil sob medida</h2>
-              <p
-                key={loadingTextIndex}
-                className="animate-fade-in-up text-purple-400 text-base sm:text-lg"
-              >
+              <p key={loadingTextIndex} className="animate-fade-in-up text-purple-400 text-base sm:text-lg">
                 {LOADING_TEXTS[loadingTextIndex]}
               </p>
             </div>
@@ -715,10 +574,7 @@ export default function QuizApp() {
 
           {/* RESULT SCREEN */}
           {step === 'result' && profileResult && (
-            <div
-              key="result"
-              className="animate-scale-in flex-1 flex flex-col pb-6 sm:pb-10"
-            >
+            <div key="result" className="animate-scale-in flex-1 flex flex-col pb-6 sm:pb-10">
               {/* Profile Card */}
               <div className="text-center mb-6 sm:mb-8">
                 <div
@@ -791,10 +647,7 @@ export default function QuizApp() {
 
           {/* SIGNUP SCREEN */}
           {step === 'signup' && (
-            <div
-              key="signup"
-              className="animate-fade-in-up flex-1 flex flex-col items-center justify-center text-center pb-6 sm:pb-10"
-            >
+            <div key="signup" className="animate-fade-in-up flex-1 flex flex-col items-center justify-center text-center pb-6 sm:pb-10">
               <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_40px_rgba(168,85,247,0.3)] mb-4 sm:mb-6">
                 <IconLock className="w-7 h-7 sm:w-9 sm:h-9 text-white" />
               </div>
@@ -805,34 +658,20 @@ export default function QuizApp() {
               </p>
 
               <div className="w-full max-w-sm space-y-4 text-left">
-                {/* Email field — pre-filled, read-only */}
                 <div>
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">E-mail</label>
-                  <input
-                    type="email"
-                    value={answers.email || ''}
-                    readOnly
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg opacity-60 cursor-not-allowed"
-                  />
+                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg opacity-60 cursor-not-allowed" />
                 </div>
-
-                {/* Password field */}
                 <div>
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">Crie sua senha</label>
                   <input
-                    type="password"
-                    placeholder="Mínimo 6 caracteres"
-                    value={signupPassword}
+                    type="password" placeholder="Mínimo 6 caracteres" value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
-                    autoFocus
-                    minLength={6}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp();
-                    }}
+                    autoFocus minLength={6}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp(); }}
                   />
                 </div>
-
                 <button
                   onClick={handleSignUp}
                   disabled={isSigningUp || signupPassword.length < 6}
@@ -844,14 +683,10 @@ export default function QuizApp() {
                       Criando conta...
                     </>
                   ) : (
-                    <>
-                      Criar Conta e Continuar <IconArrowRight className="w-5 h-5" />
-                    </>
+                    <>Criar Conta e Continuar <IconArrowRight className="w-5 h-5" /></>
                   )}
                 </button>
               </div>
-
-              {/* Privacy note — NO login link */}
               <p className="mt-6 sm:mt-8 text-gray-600 text-xs max-w-xs">
                 Seus dados estão seguros conosco. Criamos essa conta para que você possa acessar seu perfil a qualquer momento.
               </p>
@@ -860,17 +695,12 @@ export default function QuizApp() {
 
           {/* PRICING SCREEN */}
           {step === 'pricing' && (
-            <div
-              key="pricing"
-              className="animate-fade-in-up flex-1 flex flex-col pb-6 sm:pb-10"
-            >
+            <div key="pricing" className="animate-fade-in-up flex-1 flex flex-col pb-6 sm:pb-10">
               <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-xl sm:text-3xl font-bold mb-3 sm:mb-4">Escolha seu acesso Pro</h2>
-
-                {/* Real Urgency - NO fake timer */}
                 <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-medium text-xs sm:text-sm">
                   <IconCrown className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
-                  Preço de lançamento válido para os primeiros {EARLY_BIRD_LIMIT} usuários
+                  Preço de lançamento — vagas limitadas
                 </div>
               </div>
 
@@ -890,20 +720,16 @@ export default function QuizApp() {
                         Mais Popular
                       </div>
                     )}
-
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="text-base sm:text-xl font-bold mb-0.5 sm:mb-1">{plan.name}</h3>
-                        {plan.savings && (
-                          <span className="text-green-400 text-xs sm:text-sm font-medium">{plan.savings}</span>
-                        )}
+                        {plan.savings && <span className="text-green-400 text-xs sm:text-sm font-medium">{plan.savings}</span>}
                       </div>
                       <div className="text-right">
                         <div className="text-lg sm:text-2xl font-bold">{plan.price}</div>
                         <div className="text-gray-500 text-xs sm:text-sm">{plan.period}</div>
                       </div>
                     </div>
-
                     <div className={`absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                       selectedPlan === plan.id ? 'border-purple-500 bg-purple-500' : 'border-gray-600'
                     }`}>
@@ -921,7 +747,6 @@ export default function QuizApp() {
                 {isSubscribing ? 'Processando...' : 'Assinar Agora'}
               </button>
 
-              {/* Guarantee & Trust */}
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 flex items-start gap-3 sm:gap-4">
                 <IconShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 shrink-0" />
                 <div>
@@ -941,4 +766,3 @@ export default function QuizApp() {
     </div>
   );
 }
-

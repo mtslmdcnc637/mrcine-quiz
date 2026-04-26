@@ -1,5 +1,4 @@
 import { render } from 'preact';
-import { Toaster } from 'sonner';
 import QuizApp from './QuizApp';
 import { captureReferral } from './lib/referral';
 import './index.css';
@@ -15,10 +14,4 @@ if ('requestIdleCallback' in window) {
 const shell = document.getElementById('app-shell');
 if (shell) shell.remove();
 
-render(
-  <>
-    <Toaster position="top-center" richColors />
-    <QuizApp />
-  </>,
-  document.getElementById('root')!
-);
+render(<QuizApp />, document.getElementById('root')!);

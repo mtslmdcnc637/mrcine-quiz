@@ -9,14 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@preact/compat": "^18.3.2",
     "@supabase/supabase-js": "^2.48.1",
-    "preact": "^10.29.1",
-    "sonner": "^1.7.4"
+    "preact": "^10.29.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.5",
-    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
