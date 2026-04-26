@@ -587,15 +587,15 @@ export default function QuizApp() {
               </div>
 
               {/* Movie Grid */}
-              {profileMovies.length > 0 && (
-                <div className="mb-6 sm:mb-8">
-                  <h3 className="text-sm sm:text-lg font-bold mb-3 sm:mb-4 flex items-center gap-2">
-                    <IconFilm className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-                    Filmes selecionados para você
-                  </h3>
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-sm sm:text-lg font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                  <IconFilm className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                  Filmes selecionados para você
+                </h3>
+                {profileMovies.length > 0 ? (
                   <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     {profileMovies.map((movie: any) => (
-                      <div key={movie.id} className="relative aspect-[2/3] rounded-xl overflow-hidden group">
+                      <div key={movie.id} className="relative aspect-[2/3] rounded-xl overflow-hidden group bg-gray-800">
                         <img
                           src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                           alt={movie.title}
@@ -611,8 +611,16 @@ export default function QuizApp() {
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    {Array.from({length:6}).map((_,i) => (
+                      <div key={i} className="aspect-[2/3] rounded-xl bg-gray-800/50 animate-pulse flex items-center justify-center">
+                        <IconFilm className="w-5 h-5 text-gray-600" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Benefits */}
               <div className="grid gap-2 sm:gap-3 mb-6 sm:mb-8">
