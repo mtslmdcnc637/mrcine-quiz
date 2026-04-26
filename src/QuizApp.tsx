@@ -337,17 +337,11 @@ export default function QuizApp() {
       <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-8 min-h-screen flex flex-col">
 
         {/* Header / Logo */}
-        <div className="flex justify-between items-center mb-4 sm:mb-8">
+        <div className="flex justify-center mb-4 sm:mb-8">
           <div className="flex items-center gap-2">
             <IconFilm className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
             <span className="text-xl sm:text-2xl font-bold tracking-tight">MrCine<span className="text-purple-500">PRO</span></span>
           </div>
-          <button
-            onClick={() => window.location.href = 'https://mrcine.pro/login'}
-            className="text-sm font-medium text-gray-400 hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-all hover:bg-white/5"
-          >
-            Entrar
-          </button>
         </div>
 
           {/* START SCREEN */}
@@ -371,7 +365,7 @@ export default function QuizApp() {
                 <p className="text-xs sm:text-sm text-gray-500 uppercase tracking-wider font-bold mb-3 sm:mb-4 text-center">O que dizem nossos usuários</p>
                 <div className="bg-white/5 border border-white/10 p-4 sm:p-5 rounded-2xl mb-3 sm:mb-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-purple-500 to-fuchsia-500 flex items-center justify-center font-bold text-white text-sm">M</div>
+                    <img src="/avatar-mariana.png" alt="Mariana S." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-white">Mariana S.</p>
                       <div className="flex text-amber-400">
@@ -384,7 +378,7 @@ export default function QuizApp() {
 
                 <div className="bg-white/5 border border-white/10 p-4 sm:p-5 rounded-2xl mb-3 sm:mb-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center font-bold text-white text-sm">R</div>
+                    <img src="/avatar-rafael.png" alt="Rafael C." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-white">Rafael C.</p>
                       <div className="flex text-amber-400">
@@ -397,7 +391,7 @@ export default function QuizApp() {
 
                 <div className="bg-white/5 border border-white/10 p-4 sm:p-5 rounded-2xl">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center font-bold text-white text-sm">L</div>
+                    <img src="/avatar-lucas.png" alt="Lucas M." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-white">Lucas M.</p>
                       <div className="flex text-amber-400">
@@ -409,21 +403,14 @@ export default function QuizApp() {
                 </div>
               </div>
 
-              {/* CTA + Login below testimonials */}
-              <div className="mt-6 sm:mt-8 flex flex-col items-center justify-center gap-3 w-full max-w-sm">
+              {/* CTA below testimonials */}
+              <div className="mt-6 sm:mt-8 flex flex-col items-center justify-center w-full max-w-sm">
                 <button
                   onClick={handleStart}
                   className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3.5 sm:py-4 px-8 rounded-2xl text-base sm:text-lg transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_0_40px_rgba(168,85,247,0.4)] flex items-center justify-center gap-2"
                 >
                   Começar Agora <IconArrowRight className="w-5 h-5" />
                 </button>
-                <a
-                  href="https://mrcine.pro/login"
-                  onClick={(e) => { e.preventDefault(); window.location.href = 'https://mrcine.pro/login'; }}
-                  className="w-full text-gray-400 hover:text-white font-medium py-3 px-6 rounded-2xl transition-colors text-sm underline underline-offset-4 block text-center cursor-pointer"
-                >
-                  Já tenho conta — Login
-                </a>
               </div>
             </div>
           )}
@@ -466,7 +453,7 @@ export default function QuizApp() {
                         placeholder={currentQuestion.placeholder}
                         value={whatsappDisplay}
                         onChange={(e) => handleWhatsAppChange((e.target as HTMLInputElement).value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-3.5 pl-12 pr-6 text-base sm:text-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 sm:py-5 pl-12 pr-6 text-lg sm:text-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                         autoFocus
                       />
                       {answers.whatsapp && answers.whatsapp.length > 0 && !formatWhatsApp(answers.whatsapp).isValid && (
@@ -482,7 +469,7 @@ export default function QuizApp() {
                       placeholder={currentQuestion.placeholder}
                       value={currentAnswer || ''}
                       onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-3.5 px-5 text-base sm:text-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 sm:py-5 px-6 text-lg sm:text-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                       autoFocus
                     />
                   )
@@ -668,14 +655,14 @@ export default function QuizApp() {
               <div className="w-full max-w-sm space-y-4 text-left">
                 <div>
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">E-mail</label>
-                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 sm:py-3 px-4 sm:px-5 text-white text-sm sm:text-base opacity-60 cursor-not-allowed" />
+                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg opacity-60 cursor-not-allowed" />
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">Crie sua senha</label>
                   <input
                     type="password" placeholder="Mínimo 6 caracteres" value={signupPassword}
                     onChange={(e) => setSignupPassword((e.target as HTMLInputElement).value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 sm:py-3 px-4 sm:px-5 text-white text-sm sm:text-base placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                     autoFocus minLength={6}
                     onKeyDown={(e) => { if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp(); }}
                   />
