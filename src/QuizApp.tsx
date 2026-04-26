@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 // Inline SVG icons — replaces lucide-react (~38KB savings)
 function IconFilm(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="7" x2="7" y1="3" y2="21"/><line x1="17" x2="17" y1="3" y2="21"/><line x1="3" x2="7" y1="8" y2="8"/><line x1="17" x2="21" y1="8" y2="8"/><line x1="3" x2="7" y1="16" y2="16"/><line x1="17" x2="21" y1="16" y2="16"/></svg>}
 function IconStar(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
@@ -210,18 +210,6 @@ export default function QuizApp() {
   const [profileResult, setProfileResult] = useState<CinematographicProfile | null>(null);
   const [profileMovies, setProfileMovies] = useState<any[]>([]);
 
-  // TikTok Pixel — fire InitiateCheckout when user reaches pricing screen
-  useEffect(() => {
-    if (step === 'pricing') {
-      try {
-        const ttq = (window as any).ttq;
-        if (ttq && typeof ttq.track === 'function') {
-          ttq.track('InitiateCheckout');
-        }
-      } catch {}
-    }
-  }, [step]);
-
   const handleStart = () => setStep('question');
   const handleAnswer = (questionId: string, value: any) => setAnswers(prev => ({ ...prev, [questionId]: value }));
 
@@ -290,6 +278,13 @@ export default function QuizApp() {
 
   const handleSubscribe = async (planId: string) => {
     setIsSubscribing(true);
+    // TikTok Pixel — fire InitiateCheckout when user clicks subscribe
+    try {
+      const ttq = (window as any).ttq;
+      if (ttq && typeof ttq.track === 'function') {
+        ttq.track('InitiateCheckout');
+      }
+    } catch {}
     try {
       const [supabase, invokeEdgeFunction] = await Promise.all([getSupabase(), getEdgeFunction()]);
       try { await supabase.auth.refreshSession(); } catch { /* ignore */ }
