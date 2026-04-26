@@ -454,7 +454,7 @@ export default function QuizApp() {
                 <p className="text-gray-400 text-sm sm:text-base mb-4 sm:mb-8">{currentQuestion.subtitle}</p>
               )}
 
-              <div className="flex-1 mt-3 sm:mt-6">
+              <div className="mt-3 sm:mt-6">
                 {currentQuestion.type === 'input' ? (
                   currentQuestion.id === 'whatsapp' ? (
                     <div className="relative">
@@ -466,7 +466,7 @@ export default function QuizApp() {
                         placeholder={currentQuestion.placeholder}
                         value={whatsappDisplay}
                         onChange={(e) => handleWhatsAppChange((e.target as HTMLInputElement).value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 sm:py-5 pl-12 pr-6 text-lg sm:text-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-3.5 pl-12 pr-6 text-base sm:text-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                         autoFocus
                       />
                       {answers.whatsapp && answers.whatsapp.length > 0 && !formatWhatsApp(answers.whatsapp).isValid && (
@@ -482,7 +482,7 @@ export default function QuizApp() {
                       placeholder={currentQuestion.placeholder}
                       value={currentAnswer || ''}
                       onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 sm:py-5 px-6 text-lg sm:text-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-3.5 px-5 text-base sm:text-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                       autoFocus
                     />
                   )
@@ -660,14 +660,14 @@ export default function QuizApp() {
               <div className="w-full max-w-sm space-y-4 text-left">
                 <div>
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">E-mail</label>
-                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg opacity-60 cursor-not-allowed" />
+                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 sm:py-3 px-4 sm:px-5 text-white text-sm sm:text-base opacity-60 cursor-not-allowed" />
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">Crie sua senha</label>
                   <input
                     type="password" placeholder="Mínimo 6 caracteres" value={signupPassword}
                     onChange={(e) => setSignupPassword((e.target as HTMLInputElement).value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 sm:py-3 px-4 sm:px-5 text-white text-sm sm:text-base placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                     autoFocus minLength={6}
                     onKeyDown={(e) => { if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp(); }}
                   />
