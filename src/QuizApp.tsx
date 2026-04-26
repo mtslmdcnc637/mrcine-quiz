@@ -172,10 +172,10 @@ async function fetchProfileMovies(params: Record<string, string>): Promise<any[]
   try {
     const [supabase, invokeEdgeFunction] = await Promise.all([getSupabase(), getEdgeFunction()]);
     if (!supabase) return [];
-    const data = await invokeEdgeFunction<{ results?: any[] }>('tmdb-proxy', {
+    const data = (await invokeEdgeFunction('tmdb-proxy', {
       endpoint: 'discover/movie',
       params: { language: 'pt-BR', ...params },
-    });
+    })) as { results?: any[] };
     return data?.results || [];
   } catch { return []; }
 }
@@ -287,11 +287,11 @@ export default function QuizApp() {
         window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
         setIsSubscribing(false); return;
       }
-      const data = await invokeEdgeFunction<{ url?: string }>('stripe-checkout', {
+      const data = (await invokeEdgeFunction('stripe-checkout', {
         plan_id: planId, user_id: session.user.id,
         user_email: session.user.email || answers.email,
         ref_code: getReferralCode() || undefined,
-      });
+      })) as { url?: string };
       if (data?.url) { window.location.href = data.url; }
       else { throw new Error('URL de checkout não retornada'); }
     } catch (error: unknown) {
@@ -465,7 +465,7 @@ export default function QuizApp() {
                         type="tel"
                         placeholder={currentQuestion.placeholder}
                         value={whatsappDisplay}
-                        onChange={(e) => handleWhatsAppChange(e.target.value)}
+                        onChange={(e) => handleWhatsAppChange((e.target as HTMLInputElement).value)}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 sm:py-5 pl-12 pr-6 text-lg sm:text-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                         autoFocus
                       />
@@ -481,7 +481,7 @@ export default function QuizApp() {
                       type={currentQuestion.id === 'email' ? 'email' : 'text'}
                       placeholder={currentQuestion.placeholder}
                       value={currentAnswer || ''}
-                      onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
+                      onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 sm:py-5 px-6 text-lg sm:text-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                       autoFocus
                     />
@@ -666,7 +666,7 @@ export default function QuizApp() {
                   <label className="text-xs sm:text-sm text-gray-500 mb-1 block">Crie sua senha</label>
                   <input
                     type="password" placeholder="Mínimo 6 caracteres" value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
+                    onChange={(e) => setSignupPassword((e.target as HTMLInputElement).value)}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 px-4 sm:px-5 text-white text-base sm:text-lg placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:bg-white/10 transition-all"
                     autoFocus minLength={6}
                     onKeyDown={(e) => { if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp(); }}
