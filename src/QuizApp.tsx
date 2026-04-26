@@ -2,11 +2,9 @@ import { useState } from 'react';
 import { Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, TrendingUp, ShieldCheck, ArrowRight, CheckCircle2, Lock, Crown, Phone } from 'lucide-react';
 // Standalone quiz — no react-router-dom navigation needed
 import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, PRICING_PLANS } from './config/quizData';
-import { supabase } from './lib/supabase';
-// supabaseService functions inlined below
-import { invokeEdgeFunction } from './lib/edgeFunction';
-// GENRES not needed in standalone quiz
-// ProBadge not needed in standalone quiz
+// Lazy imports — Supabase is only needed after quiz completion
+const supabasePromise = import('./lib/supabase').then(m => m.supabase);
+const edgeFunctionPromise = import('./lib/edgeFunction').then(m => m.invokeEdgeFunction);
 import { toast } from 'sonner';
 import { getReferralCode } from './lib/referral';
 
@@ -195,6 +193,7 @@ function formatWhatsApp(value: string): { formatted: string; digits: string; isV
 // No user session is required.
 async function fetchProfileMovies(params: Record<string, string>): Promise<any[]> {
   try {
+    const [supabase, invokeEdgeFunction] = await Promise.all([supabasePromise, edgeFunctionPromise]);
     if (!supabase) return [];
 
     const data = await invokeEdgeFunction<{ results?: any[] }>('tmdb-proxy', {
@@ -210,6 +209,7 @@ async function fetchProfileMovies(params: Record<string, string>): Promise<any[]
 // Save quiz progress to Supabase (for analytics / future dashboard)
 async function saveQuizProgress(answers: Record<string, any>, currentStep: number, completed: boolean) {
   try {
+    const supabase = await supabasePromise;
     if (!supabase) return;
     await supabase
       .from('quiz_responses')
@@ -307,6 +307,7 @@ export default function QuizApp() {
     }
     setIsSigningUp(true);
     try {
+      const supabase = await supabasePromise;
       // Inline signUpWithEmail
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: answers.email,
@@ -354,6 +355,7 @@ export default function QuizApp() {
   const handleSubscribe = async (planId: string) => {
     setIsSubscribing(true);
     try {
+      const [supabase, invokeEdgeFunction] = await Promise.all([supabasePromise, edgeFunctionPromise]);
       // Force-refresh session to avoid 401 on edge function
       try {
         await supabase.auth.refreshSession();
