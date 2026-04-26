@@ -19,9 +19,6 @@ export default defineConfig({
             if (id.includes('react-dom') || id.includes('/react/')) {
               return 'vendor-react';
             }
-            if (id.includes('framer-motion')) {
-              return 'vendor-motion';
-            }
             if (id.includes('@supabase')) {
               return 'vendor-supabase';
             }

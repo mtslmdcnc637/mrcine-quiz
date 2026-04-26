@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Target, Zap, Heart, Clock, Star, Film, Tv, Coffee, TrendingUp, ShieldCheck, ArrowRight, CheckCircle2, Lock, Crown, Phone } from 'lucide-react';
 // Standalone quiz — no react-router-dom navigation needed
 import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, PRICING_PLANS } from './config/quizData';
@@ -453,16 +452,11 @@ export default function QuizApp() {
           </button>
         </div>
 
-        <AnimatePresence mode="wait">
-
           {/* START SCREEN */}
           {step === 'start' && (
-            <motion.div
+            <div
               key="start"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              className="flex-1 flex flex-col items-center justify-start text-center mt-2 sm:mt-10"
+              className="animate-fade-in-up flex-1 flex flex-col items-center justify-start text-center mt-2 sm:mt-10"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-purple-500/10 text-purple-400 text-xs sm:text-sm font-medium mb-3 sm:mb-6 border border-purple-500/20">
                 <SparklesIcon className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -536,17 +530,14 @@ export default function QuizApp() {
                   Já tenho conta — Login
                 </a>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* QUESTION SCREEN */}
           {step === 'question' && (
-            <motion.div
+            <div
               key={`q-${currentQuestionIndex}`}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              className="flex-1 flex flex-col"
+              className="animate-fade-in-right flex-1 flex flex-col"
             >
               {/* Progress Bar */}
               <div className="mb-4 sm:mb-10">
@@ -669,22 +660,19 @@ export default function QuizApp() {
                   Continuar
                 </button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* LOADING SCREEN */}
           {step === 'loading' && (
-            <motion.div
+            <div
               key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center text-center"
+              className="animate-fade-in flex-1 flex flex-col items-center justify-center text-center"
             >
               <div className="relative w-24 h-24 sm:w-32 sm:h-32 mb-6 sm:mb-8">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="45" fill="none" stroke="#1f2937" strokeWidth="4" />
-                  <motion.circle
+                  <circle
                     cx="50" cy="50" r="45" fill="none" stroke="#a855f7" strokeWidth="4"
                     strokeDasharray="283"
                     strokeDashoffset={283 - (283 * loadingProgress) / 100}
@@ -697,39 +685,28 @@ export default function QuizApp() {
               </div>
 
               <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Criando seu perfil sob medida</h2>
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={loadingTextIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-purple-400 text-base sm:text-lg"
-                >
-                  {LOADING_TEXTS[loadingTextIndex]}
-                </motion.p>
-              </AnimatePresence>
-            </motion.div>
+              <p
+                key={loadingTextIndex}
+                className="animate-fade-in-up text-purple-400 text-base sm:text-lg"
+              >
+                {LOADING_TEXTS[loadingTextIndex]}
+              </p>
+            </div>
           )}
 
           {/* RESULT SCREEN */}
           {step === 'result' && profileResult && (
-            <motion.div
+            <div
               key="result"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col pb-6 sm:pb-10"
+              className="animate-scale-in flex-1 flex flex-col pb-6 sm:pb-10"
             >
               {/* Profile Card */}
               <div className="text-center mb-6 sm:mb-8">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", damping: 15, delay: 0.2 }}
-                  className={`w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-full bg-gradient-to-br ${profileResult.color} flex items-center justify-center text-4xl sm:text-6xl shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4 sm:mb-6`}
+                <div
+                  className={`animate-bounce-in w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-full bg-gradient-to-br ${profileResult.color} flex items-center justify-center text-4xl sm:text-6xl shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4 sm:mb-6`}
                 >
                   {profileResult.icon}
-                </motion.div>
+                </div>
                 <h2 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">Você é o <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-500">{profileResult.name}</span>!</h2>
                 <p className="text-gray-400 text-sm sm:text-lg leading-relaxed max-w-md mx-auto">{profileResult.description}</p>
               </div>
@@ -767,12 +744,10 @@ export default function QuizApp() {
                 {RESULT_BENEFITS.map((benefit, i) => {
                   const Icon = IconMap[benefit.icon];
                   return (
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1 }}
+                    <div
                       key={i}
-                      className="bg-white/5 border border-white/10 p-3 sm:p-4 rounded-2xl flex gap-3"
+                      className="animate-slide-in-left bg-white/5 border border-white/10 p-3 sm:p-4 rounded-2xl flex gap-3"
+                      style={{ animationDelay: `${i * 0.1}s` }}
                     >
                       <div className="bg-purple-500/20 p-2 sm:p-2.5 rounded-xl h-fit">
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
@@ -781,7 +756,7 @@ export default function QuizApp() {
                         <h3 className="font-bold text-sm sm:text-base mb-0.5">{benefit.title}</h3>
                         <p className="text-gray-400 text-xs sm:text-sm">{benefit.desc}</p>
                       </div>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -792,16 +767,14 @@ export default function QuizApp() {
               >
                 Desbloquear Meu Perfil Completo
               </button>
-            </motion.div>
+            </div>
           )}
 
           {/* SIGNUP SCREEN */}
           {step === 'signup' && (
-            <motion.div
+            <div
               key="signup"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex-1 flex flex-col items-center justify-center text-center pb-6 sm:pb-10"
+              className="animate-fade-in-up flex-1 flex flex-col items-center justify-center text-center pb-6 sm:pb-10"
             >
               <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_40px_rgba(168,85,247,0.3)] mb-4 sm:mb-6">
                 <Lock className="w-7 h-7 sm:w-9 sm:h-9 text-white" />
@@ -863,16 +836,14 @@ export default function QuizApp() {
               <p className="mt-6 sm:mt-8 text-gray-600 text-xs max-w-xs">
                 Seus dados estão seguros conosco. Criamos essa conta para que você possa acessar seu perfil a qualquer momento.
               </p>
-            </motion.div>
+            </div>
           )}
 
           {/* PRICING SCREEN */}
           {step === 'pricing' && (
-            <motion.div
+            <div
               key="pricing"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex-1 flex flex-col pb-6 sm:pb-10"
+              className="animate-fade-in-up flex-1 flex flex-col pb-6 sm:pb-10"
             >
               <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-xl sm:text-3xl font-bold mb-3 sm:mb-4">Escolha seu acesso Pro</h2>
@@ -945,10 +916,8 @@ export default function QuizApp() {
               <div className="mt-4 sm:mt-6 flex justify-center items-center gap-2 text-gray-500 text-xs sm:text-sm">
                 <Lock className="w-3 h-3 sm:w-4 sm:h-4" /> Pagamento 100% Seguro via Stripe
               </div>
-            </motion.div>
+            </div>
           )}
-
-        </AnimatePresence>
       </div>
     </div>
   );
