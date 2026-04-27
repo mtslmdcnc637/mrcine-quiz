@@ -150,6 +150,18 @@ export const QUIZ_QUESTIONS = [
       { id: 'revisit', label: 'Acabo reassistindo algo que já vi' }
     ]
   },
+  {
+    id: 'decision_time',
+    phase: 3,
+    title: 'Quanto tempo você leva pra escolher um filme quando está em dúvida?',
+    type: 'single',
+    options: [
+      { id: '10min', label: 'Até 10 minutos — sou rápido(a)' },
+      { id: '30min', label: 'Uns 30 minutos — demoro um pouco' },
+      { id: '1h', label: 'Cerca de 1 hora — é uma decisão difícil' },
+      { id: '1h+', label: 'Mais de 1 hora — às vezes desisto' }
+    ]
+  },
 
   // FASE 4: PERSONALIDADE
   {
@@ -184,6 +196,18 @@ export const QUIZ_QUESTIONS = [
       { id: 'never', label: 'Nunca reassisto, a vida é curta demais' },
       { id: 'comfort', label: 'Reassisto meus favoritos quando preciso de conforto' },
       { id: 'rarely', label: 'Raramente, só se passou muito tempo' }
+    ]
+  },
+  {
+    id: 'time_value',
+    phase: 4,
+    title: 'Se pudesse colocar um preço, quanto vale uma hora do seu tempo livre?',
+    type: 'single',
+    options: [
+      { id: '10', label: 'R$ 10 — meu tempo é importante, mas nem tanto' },
+      { id: '25', label: 'R$ 25 — valorizo bastante meu descanso' },
+      { id: '50', label: 'R$ 50 — cada hora livre é preciosa' },
+      { id: '100', label: 'R$ 100+ — meu tempo livre é inestimável' }
     ]
   },
 

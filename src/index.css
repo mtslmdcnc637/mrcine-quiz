@@ -2,29 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: #0a0a0b;
+  --surface: #141416;
+  --surface-2: #1c1c20;
+  --surface-3: #242428;
+  --accent: #d4a853;
+  --accent-dim: rgba(212,168,83,0.15);
+  --accent-glow: rgba(212,168,83,0.3);
+  --danger: #c75050;
+  --danger-dim: rgba(199,80,80,0.12);
+  --success: #5aad6e;
+  --success-dim: rgba(90,173,110,0.12);
+  --text: #f0ece4;
+  --text-secondary: #a09a90;
+  --text-muted: #5a5650;
+  --border: rgba(255,255,255,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --ease: cubic-bezier(0.4,0,0.2,1);
+}
+
 @layer base {
   body {
-    @apply bg-[#0a0a0a] text-white antialiased;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  /* Prevent layout shift for root */
   #root {
     min-height: 100vh;
     min-height: 100dvh;
   }
-  /* Smooth scrolling for better UX */
   html {
     scroll-behavior: smooth;
+    font-size: 16px;
   }
 }
 
-@layer utilities {
-  .glass-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-    backdrop-filter: blur(40px);
-  }
+/* ── Background Effects ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(212,168,83,0.05), transparent),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(212,168,83,0.03), transparent);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* CSS Animations — replaces framer-motion */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Particles ── */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  animation: float linear infinite;
+}
+@keyframes float {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+}
+
+/* ── Pulse animation ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── CSS Animations ── */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -50,9 +119,307 @@
   60% { transform: scale(1.1); }
   100% { transform: scale(1); }
 }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 .animate-fade-in-up { animation: fadeInUp 0.4s ease-out; }
 .animate-fade-in-right { animation: fadeInRight 0.3s ease-out; }
 .animate-scale-in { animation: scaleIn 0.4s ease-out; }
 .animate-slide-in-left { animation: slideInLeft 0.3s ease-out both; }
 .animate-bounce-in { animation: bounceIn 0.5s ease-out 0.2s both; }
+.animate-fade-up { animation: fadeUp 0.7s var(--ease) forwards; }
+.animate-screen-in { animation: screenIn 0.6s var(--ease) forwards; }
+
+/* ── Score Ring ── */
+.score-ring {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.score-ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.score-ring circle {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.score-ring .bg {
+  stroke: var(--surface-3);
+}
+.score-ring .fill {
+  stroke: var(--danger);
+  stroke-dasharray: 502;
+  stroke-dashoffset: 502;
+  transition: stroke-dashoffset 2s var(--ease);
+}
+.score-ring .fill.warn {
+  stroke: var(--accent);
+}
+.score-ring .fill.good {
+  stroke: var(--success);
+}
+
+/* Glow behind ring */
+.score-ring::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(199,80,80,0.08), transparent 70%);
+}
+
+/* ── Question Card ── */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.question-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+}
+
+/* ── Option Cards ── */
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.option-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.option-card:hover {
+  border-color: rgba(212,168,83,0.3);
+  transform: translateX(4px);
+}
+.option-card:hover::before {
+  opacity: 1;
+}
+.option-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.option-card.selected::before {
+  opacity: 1;
+}
+
+/* ── Custom Radio Buttons ── */
+.option-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--text-muted);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+.option-card.selected .option-radio {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.option-card.selected .option-radio::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+/* ── Pain Points ── */
+.pain-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.pain-point.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.pain-point:hover {
+  border-color: rgba(255,255,255,0.1);
+}
+
+.pain-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+.pain-icon.high { background: var(--danger-dim); }
+.pain-icon.med { background: rgba(212,168,83,0.1); }
+.pain-icon.low { background: var(--success-dim); }
+
+.pain-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  flex-shrink: 0;
+  align-self: center;
+  white-space: nowrap;
+}
+.pain-badge.high { color: var(--danger); background: var(--danger-dim); }
+.pain-badge.med { color: var(--accent); background: rgba(212,168,83,0.08); }
+
+/* ── Urgency Bar ── */
+.urgency-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--danger-dim);
+  border: 1px solid rgba(199,80,80,0.12);
+  font-size: 0.85rem;
+  color: var(--danger);
+}
+.urgency-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: pulse 1s ease infinite;
+}
+
+/* ── CTA Button ── */
+.cta-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 40px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent) 0%, #c49a3e 100%);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+.cta-gold::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+.cta-gold:hover::before {
+  transform: translateX(100%);
+}
+.cta-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212,168,83,0.3);
+}
+.cta-gold:active {
+  transform: translateY(0);
+}
+.cta-gold:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Offer Section ── */
+.offer-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+}
+.offer-top-bar {
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #e8c46e, var(--accent));
+}
+
+/* ── ROI Card ── */
+.roi-card {
+  background: var(--success-dim);
+  border: 1px solid rgba(90,173,110,0.2);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+}
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  margin: 40px 0;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .question-card {
+    padding: 28px 22px;
+  }
+  .option-card {
+    padding: 14px 16px;
+  }
+  .score-ring {
+    width: 170px;
+    height: 170px;
+  }
+  .pain-point {
+    padding: 14px 16px;
+  }
+}
