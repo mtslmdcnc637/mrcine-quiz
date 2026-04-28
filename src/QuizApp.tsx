@@ -531,14 +531,20 @@ export default function QuizApp() {
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
   const currentAnswer = answers[currentQuestion.id];
 
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
   const isNextDisabled = () => {
     if (!currentAnswer) return true;
     if (currentQuestion.type === 'multiple' && currentQuestion.min) return currentAnswer.length < currentQuestion.min;
     if (currentQuestion.type === 'input') {
+      if (currentQuestion.id === 'email') {
+        return !isValidEmail(currentAnswer);
+      }
       if (currentQuestion.id === 'whatsapp') {
-        if (!currentAnswer || currentAnswer.replace(/\D/g, '').length === 0) return false;
+        if (!currentAnswer || currentAnswer.replace(/\D/g, '').length === 0) return true;
         return !formatWhatsApp(currentAnswer).isValid;
       }
+      // name and other text inputs — allow after 2+ characters
       return currentAnswer.trim().length < 2;
     }
     return false;
@@ -719,6 +725,7 @@ export default function QuizApp() {
                           placeholder={currentQuestion.placeholder}
                           value={whatsappDisplay}
                           onChange={(e) => handleWhatsAppChange((e.target as HTMLInputElement).value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNextQuestion(); }}
                           className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-4 sm:py-5 pl-12 pr-6 text-lg sm:text-xl text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
                           autoFocus
                         />
@@ -730,14 +737,30 @@ export default function QuizApp() {
                         )}
                       </div>
                     ) : (
-                      <input
-                        type={currentQuestion.id === 'email' ? 'email' : 'text'}
-                        placeholder={currentQuestion.placeholder}
-                        value={currentAnswer || ''}
-                        onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
-                        className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-4 sm:py-5 px-6 text-lg sm:text-xl text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
-                        autoFocus
-                      />
+                      <div>
+                        <input
+                          type={currentQuestion.id === 'email' ? 'email' : 'text'}
+                          placeholder={currentQuestion.placeholder}
+                          value={currentAnswer || ''}
+                          onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNextQuestion(); }}
+                          className={`w-full bg-[var(--surface-2)] border rounded-[var(--radius-sm)] py-4 sm:py-5 px-6 text-lg sm:text-xl text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none transition-all ${
+                            currentQuestion.id === 'email' && currentAnswer
+                              ? isValidEmail(currentAnswer)
+                                ? 'border-[var(--success)] focus:border-[var(--success)]'
+                                : 'border-[var(--accent)] focus:border-[var(--accent)]'
+                              : 'border-[var(--border)] focus:border-[var(--accent)]'
+                          }`}
+                          autoFocus
+                        />
+                        {currentQuestion.id === 'email' && currentAnswer && (
+                          isValidEmail(currentAnswer) ? (
+                            <p className="text-[var(--success)] text-xs mt-2 ml-1">E-mail válido!</p>
+                          ) : (
+                            <p className="text-[var(--text-muted)] text-xs mt-2 ml-1">Digite um e-mail válido para continuar</p>
+                          )
+                        )}
+                      </div>
                     )
                   ) : (
                     <div className="grid gap-2.5 sm:gap-3">
@@ -781,7 +804,7 @@ export default function QuizApp() {
                     <button
                       onClick={handleNextQuestion}
                       disabled={isNextDisabled()}
-                      className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg ${isNextDisabled() ? 'opacity-40 cursor-not-allowed !transform-none !shadow-none' : ''}`}
+                      className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg transition-all duration-300 ${isNextDisabled() ? 'opacity-40 cursor-not-allowed !transform-none !shadow-none !background-none' : 'opacity-100'}`}
                     >
                       Continuar
                     </button>
