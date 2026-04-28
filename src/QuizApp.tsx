@@ -595,16 +595,40 @@ export default function QuizApp() {
               </div>
 
               <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-light leading-[1.1] mb-4 sm:mb-6">
-                Descubra o que está<br />segurando o seu<br /><em className="italic font-normal" style={{background:'linear-gradient(135deg, var(--accent), #e8c46e)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'}}>potencial cinematográfico</em>
+                Cansado de rolar a Netflix<br />sem saber o que assistir?
               </h1>
 
-              <p className="text-[var(--text-secondary)] text-sm sm:text-lg mb-4 sm:mb-6 max-w-md leading-relaxed">
-                Responda a este quiz rápido para gerar um algoritmo 100% focado no seu gosto pessoal.
+              <p className="text-[var(--text-secondary)] text-base sm:text-lg mb-4 sm:mb-5 max-w-md leading-relaxed">
+                <em className="italic font-normal" style={{background:'linear-gradient(135deg, var(--accent), #e8c46e)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'}}>Seu perfil de cinema revela o filme perfeito em segundos.</em>
               </p>
+
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] p-4 sm:p-5 max-w-md text-left mb-6 sm:mb-8">
+                <p className="text-[var(--text-secondary)] text-sm sm:text-base font-medium mb-3">Ao final do quiz você vai:</p>
+                <ul className="space-y-2.5">
+                  <li className="flex items-start gap-2.5 text-sm sm:text-base text-[var(--text)]">
+                    <span className="mt-1 shrink-0 w-5 h-5 rounded-full bg-[var(--accent-dim)] flex items-center justify-center">
+                      <svg className="w-3 h-3 text-[var(--accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    Descobrir seu perfil real de cinema
+                  </li>
+                  <li className="flex items-start gap-2.5 text-sm sm:text-base text-[var(--text)]">
+                    <span className="mt-1 shrink-0 w-5 h-5 rounded-full bg-[var(--accent-dim)] flex items-center justify-center">
+                      <svg className="w-3 h-3 text-[var(--accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    Ver quanto tempo e dinheiro está desperdiçando
+                  </li>
+                  <li className="flex items-start gap-2.5 text-sm sm:text-base text-[var(--text)]">
+                    <span className="mt-1 shrink-0 w-5 h-5 rounded-full bg-[var(--accent-dim)] flex items-center justify-center">
+                      <svg className="w-3 h-3 text-[var(--accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    Conhecer a IA que encontra o filme perfeito pra você em segundos
+                  </li>
+                </ul>
+              </div>
 
               <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius-sm)] bg-[var(--success-dim)] border border-[rgba(90,173,110,0.2)] text-[var(--success)] text-sm font-medium mb-8 sm:mb-12">
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                Este diagnóstico é 100% gratuito — sem pegadinhas
+                100% gratuito — sem pegadinhas
               </div>
 
               <div className="flex gap-6 mb-8 sm:mb-12 text-sm text-[var(--text-muted)]">
