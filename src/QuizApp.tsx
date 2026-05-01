@@ -299,18 +299,32 @@ async function fetchProfileMovies(params: Record<string, string>): Promise<any[]
   } catch { return []; }
 }
 
-// Save quiz progress to Supabase
+// Session-scoped submission ID — upserts into same row across steps
+function getSubmissionId(): string {
+  const key = 'mrcine_submission';
+  try {
+    let id = sessionStorage.getItem(key);
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem(key, id);
+    }
+    return id;
+  } catch { return crypto.randomUUID(); }
+}
+
+// Save quiz progress to Supabase — upserts (1 row per session)
 async function saveQuizProgress(answers: Record<string, any>, currentStep: number, completed: boolean) {
   try {
     const supabase = await getSupabase();
     if (!supabase) return;
-    await supabase.from('quiz_responses').insert({
+    await supabase.from('quiz_responses').upsert({
+      submission_id: getSubmissionId(),
       name: answers.name || null,
       email: answers.email || null,
       whatsapp: answers.whatsapp || null,
       profile_type: completed ? calculateProfile(answers).name : null,
       answers, last_step: currentStep, completed,
-    });
+    }, { onConflict: 'submission_id' });
   } catch { /* analytics only */ }
 }
 
