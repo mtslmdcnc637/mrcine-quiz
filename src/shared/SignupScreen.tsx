@@ -80,7 +80,7 @@ export default function SignupScreen({ email, name, onSuccess, onBack }: SignupS
           <label className="text-xs sm:text-sm text-[var(--text-muted)] mb-1 block font-mono tracking-wider uppercase">Crie sua senha</label>
           <input
             type="password" placeholder="Mínimo 6 caracteres" value={password}
-            onChange={(e) => setPassword((e.target as HTMLInputElement).value)}
+            onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
             className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-3 sm:py-4 px-4 sm:px-5 text-[var(--text)] text-base sm:text-lg placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
             autoFocus minlength={6}
             autocomplete="new-password"

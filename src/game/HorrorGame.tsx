@@ -6,6 +6,7 @@ import GameHUD from './components/GameHUD';
 import SignupScreen from '../shared/SignupScreen';
 import PricingScreen from '../shared/PricingScreen';
 import { HORROR_QUESTIONS, calculateHorrorProfile } from './data/horrorQuestions';
+import { RESULT_FEATURES_EXPANDED } from '../config/quizData';
 import { supabase } from '../lib/supabase';
 
 function IconArrowRight(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>; }
@@ -14,10 +15,15 @@ function IconBrain(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" view
 function IconHeart(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>; }
 function IconTarget(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>; }
 function IconZap(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>; }
+function IconShieldCheck(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>; }
+function IconSparkles(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>; }
+function IconClock(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>; }
+function IconCrown(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg>; }
+function IconTrendingUp(p: any) { return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>; }
 
 type Screen = 'intro' | 'questions' | 'loading' | 'result' | 'signup' | 'pricing';
 
-const IconMap: Record<string, any> = { Brain: IconBrain, Zap: IconZap, Target: IconTarget, Heart: IconHeart, ArrowRight: IconArrowRight };
+const IconMap: Record<string, any> = { Brain: IconBrain, Zap: IconZap, Target: IconTarget, Heart: IconHeart, ArrowRight: IconArrowRight, Clock: IconClock, Sparkles: IconSparkles, Crown: IconCrown, TrendingUp: IconTrendingUp, Film: IconFilm, ShieldCheck: IconShieldCheck };
 
 const accentHorror = '#cc3333';
 const bgHorror = '#0a0a0b';
@@ -191,9 +197,56 @@ export default function HorrorGame() {
             </p>
           </div>
 
+          <div className="w-full max-w-md mb-5 sm:mb-6">
+            <div className="font-mono text-[0.68rem] tracking-[0.18em] uppercase mb-3 text-left" style={{ color: accentHorror }}>O que o MrCine PRO entrega</div>
+            <div className="grid gap-2.5 sm:gap-3">
+              {RESULT_FEATURES_EXPANDED.slice(0, 4).map((feat, i) => {
+                const Icon = IconMap[feat.icon] || IconZap;
+                return (
+                  <div key={i} className="animate-slide-in-left bg-[var(--surface)] rounded-[var(--radius-sm)] p-3 sm:p-4 flex items-start gap-3 text-left"
+                    style={{ animationDelay: `${i * 0.1}s`, border: '1px solid var(--border)' }}>
+                    <div className="p-2 rounded-lg h-fit shrink-0" style={{ background: feat.bg }}>
+                      <Icon className="w-4 h-4" style={{ color: feat.color }} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-sm mb-0.5">{feat.title}</h3>
+                      <p className="text-[var(--text-secondary)] text-xs leading-relaxed">{feat.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="w-full max-w-md mb-5 sm:mb-6 p-4 rounded-[var(--radius)] bg-[var(--surface)] text-left" style={{ border: '1px solid var(--border)' }}>
+            <div className="font-mono text-[0.68rem] text-[var(--success)] tracking-[0.15em] uppercase mb-2">Impacto no seu bolso</div>
+            <div className="flex items-end justify-between mb-3">
+              <div>
+                <p className="text-xs text-[var(--text-secondary)] mb-0.5">Streamings atuais</p>
+                <p className="font-display text-lg font-light text-[var(--text)]">~R$ 100/mês</p>
+              </div>
+              <div className="text-[var(--text-muted)] mb-1">vs</div>
+              <div className="text-right">
+                <p className="text-xs text-[var(--text-secondary)] mb-0.5">MrCine PRO</p>
+                <p className="font-display text-lg font-light" style={{ color: 'var(--success)' }}>R$ 9/mês</p>
+              </div>
+            </div>
+            <p className="text-[var(--text-secondary)] text-xs">
+              <strong className="text-[var(--success)]">Menos de 10%</strong> do custo pra resolver o problema que nenhum streaming resolve.
+            </p>
+          </div>
+
+          <div className="w-full max-w-md mb-6 sm:mb-8 p-4 rounded-[var(--radius)] bg-[var(--surface)] flex items-start gap-3 text-left" style={{ border: '1px solid rgba(90,173,110,0.2)' }}>
+            <IconShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--success)] shrink-0" />
+            <p className="text-[var(--text-secondary)] text-xs leading-relaxed">
+              <strong className="text-[var(--success)]">Garantia de 7 dias.</strong> Se não economizar tempo na primeira semana, devolvemos 100%.
+            </p>
+          </div>
+
           <button onClick={() => setScreen('signup')} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
             Desbloquear Perfil Sombrio <IconArrowRight className="w-5 h-5" />
           </button>
+          <p className="text-[var(--text-muted)] text-xs mt-3 text-center">+2.000 cinéfilos já pararam de perder tempo escolhendo filme</p>
         </div>
       </div>
     );
@@ -268,7 +321,7 @@ export default function HorrorGame() {
                   type={currentQ.id === 'horror_email' ? 'email' : 'text'}
                   placeholder={currentQ.placeholder}
                   value={currentAnswer || ''}
-                  onChange={(e) => handleAnswer(currentQ.id, (e.target as HTMLInputElement).value)}
+                  onInput={(e) => handleAnswer(currentQ.id, (e.target as HTMLInputElement).value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNext(); }}
                   autocomplete={currentQ.id === 'horror_email' ? 'email' : 'name'}
                   aria-label={currentQ.id}

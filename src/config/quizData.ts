@@ -269,6 +269,51 @@ export const RESULT_BENEFITS = [
   }
 ];
 
+export const RESULT_FEATURES_EXPANDED = [
+  {
+    title: "Oráculo de IA",
+    desc: "Um algoritmo que aprende com seus gostos a cada interação. Quanto mais você usa, mais certeiro ele fica. Como um personal trainer de filmes que nunca erra.",
+    icon: "Sparkles",
+    color: 'var(--accent)',
+    bg: 'var(--accent-dim)',
+  },
+  {
+    title: "Gamificação Cinematográfica",
+    desc: "Acumule XP, suba de nível, desbloqueie conquistas e compita no ranking. Transforme sua jornada de filmes em um RPG pessoal.",
+    icon: "Crown",
+    color: 'var(--accent)',
+    bg: 'var(--accent-dim)',
+  },
+  {
+    title: "Decisão em 5 Segundos",
+    desc: "Chega de 30 minutos rolando catálogo. Abra o app, veja a recomendação do Oráculo, assista. Simples assim. Sua noite começa na hora certa.",
+    icon: "Zap",
+    color: 'var(--accent)',
+    bg: 'var(--accent-dim)',
+  },
+  {
+    title: "Perfil que Evolui",
+    desc: "Seu perfil cinematográfico não é estático. Ele muda conforme você assiste, avalia e interage. Nunca mais receba recomendações genéricas.",
+    icon: "TrendingUp",
+    color: 'var(--accent)',
+    bg: 'var(--accent-dim)',
+  },
+  {
+    title: "Modo Casal e Grupo",
+    desc: "Assistindo com seu parceiro ou amigos? O Oráculo cruza os perfis e sugere o filme que agrada todo mundo. Fim da discussão de 'o que assistir'.",
+    icon: "Heart",
+    color: 'var(--accent)',
+    bg: 'var(--accent-dim)',
+  },
+  {
+    title: "Notificações Inteligentes",
+    desc: "Novo filme do seu diretor favorito? Estreia do gênero que você ama? O Oráculo te avisa na hora certa, sem spam. Só o que importa pra você.",
+    icon: "Film",
+    color: 'var(--accent)',
+    bg: 'var(--accent-dim)',
+  },
+];
+
 export const PRICING_PLANS = [
   {
     id: 'monthly',

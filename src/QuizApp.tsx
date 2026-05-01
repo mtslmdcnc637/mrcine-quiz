@@ -46,7 +46,7 @@ function IconTv(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 
 function IconCoffee(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>}
 function IconTrendingUp(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>}
 
-import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS } from './config/quizData';
+import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, RESULT_FEATURES_EXPANDED } from './config/quizData';
 import SignupScreen from './shared/SignupScreen';
 import PricingScreen from './shared/PricingScreen';
 
@@ -709,7 +709,7 @@ export default function QuizApp() {
                           type="tel"
                           placeholder={currentQuestion.placeholder}
                           value={whatsappDisplay}
-                          onChange={(e) => handleWhatsAppChange((e.target as HTMLInputElement).value)}
+                          onInput={(e) => handleWhatsAppChange((e.target as HTMLInputElement).value)}
                           onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNextQuestion(); }}
                           className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-4 sm:py-5 pl-12 pr-6 text-lg sm:text-xl text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
                           autoFocus
@@ -729,7 +729,7 @@ export default function QuizApp() {
                           type={currentQuestion.id === 'email' ? 'email' : 'text'}
                           placeholder={currentQuestion.placeholder}
                           value={currentAnswer || ''}
-                          onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
+                          onInput={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
                           onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNextQuestion(); }}
                           autocomplete={currentQuestion.id === 'email' ? 'email' : currentQuestion.id === 'name' ? 'name' : 'off'}
                           aria-label={currentQuestion.id}
@@ -951,12 +951,99 @@ export default function QuizApp() {
                 })}
               </div>
 
+              {/* Expanded Feature Highlights */}
+              <div className="mb-6 sm:mb-8">
+                <div className="font-mono text-[0.68rem] text-[var(--accent)] tracking-[0.18em] uppercase mb-4 flex items-center gap-2">
+                  <IconSparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Por que o MrCine PRO muda tudo
+                </div>
+                <div className="grid gap-2.5 sm:gap-3">
+                  {RESULT_FEATURES_EXPANDED.map((feat, i) => {
+                    const Icon = IconMap[feat.icon];
+                    return (
+                      <div
+                        key={i}
+                        className="animate-slide-in-left bg-[var(--surface)] border border-[var(--border)] p-3 sm:p-4 rounded-[var(--radius-sm)] flex items-start gap-3 sm:gap-4"
+                        style={{ animationDelay: `${(i + 4) * 0.1}s` }}
+                      >
+                        <div className="p-2 sm:p-2.5 rounded-lg h-fit shrink-0" style={{ background: feat.bg }}>
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: feat.color }} />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-sm sm:text-base mb-0.5">{feat.title}</h3>
+                          <p className="text-[var(--text-secondary)] text-xs sm:text-sm leading-relaxed">{feat.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Cost Comparison */}
+              <div className="mb-6 sm:mb-8 p-4 sm:p-5 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]">
+                <div className="font-mono text-[0.68rem] text-[var(--success)] tracking-[0.15em] uppercase mb-3">Comparação de custo</div>
+                <div className="flex items-end justify-between mb-3">
+                  <div>
+                    <p className="text-sm text-[var(--text-secondary)] mb-0.5">Seus streamings atuais</p>
+                    <p className="font-display text-xl sm:text-2xl font-light text-[var(--text)]">
+                      ~R$ 100<span className="text-[var(--text-muted)] text-lg">/mês</span>
+                    </p>
+                  </div>
+                  <div className="text-[var(--text-muted)] text-2xl mb-1">vs</div>
+                  <div className="text-right">
+                    <p className="text-sm text-[var(--text-secondary)] mb-0.5">MrCine PRO</p>
+                    <p className="font-display text-xl sm:text-2xl font-light" style={{ color: 'var(--success)' }}>
+                      R$ 9<span className="text-[var(--text-muted)] text-lg">/mês</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="h-2 w-full bg-[var(--surface-3)] rounded-full overflow-hidden mb-2">
+                  <div className="h-full w-[9%] rounded-full" style={{ background: 'linear-gradient(90deg, var(--success), #7dd48e)', boxShadow: '0 0 10px rgba(90,173,110,0.3)' }} />
+                </div>
+                <p className="text-[var(--text-secondary)] text-xs">
+                  Por <strong className="text-[var(--success)]">menos de 10%</strong> do custo dos seus streamings, você resolve o problema que nenhum deles resolve: <em>o que assistir</em>.
+                </p>
+              </div>
+
+              {/* Satisfaction Chart */}
+              <div className="mb-6 sm:mb-8 p-4 sm:p-5 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]">
+                <div className="font-mono text-[0.68rem] text-[var(--accent)] tracking-[0.15em] uppercase mb-3">Depois do MrCine PRO</div>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="p-3 rounded-[var(--radius-sm)]" style={{ background: 'var(--success-dim)' }}>
+                    <div className="font-display text-xl sm:text-2xl font-semibold text-[var(--success)]">92%</div>
+                    <div className="text-[0.6rem] sm:text-[0.65rem] text-[var(--text-muted)] font-mono tracking-[0.1em] uppercase mt-1">Satisfação</div>
+                  </div>
+                  <div className="p-3 rounded-[var(--radius-sm)]" style={{ background: 'var(--accent-dim)' }}>
+                    <div className="font-display text-xl sm:text-2xl font-semibold text-[var(--accent)]">40min</div>
+                    <div className="text-[0.6rem] sm:text-[0.65rem] text-[var(--text-muted)] font-mono tracking-[0.1em] uppercase mt-1">Economizados</div>
+                  </div>
+                  <div className="p-3 rounded-[var(--radius-sm)]" style={{ background: 'var(--success-dim)' }}>
+                    <div className="font-display text-xl sm:text-2xl font-semibold text-[var(--success)]">4.9</div>
+                    <div className="text-[0.6rem] sm:text-[0.65rem] text-[var(--text-muted)] font-mono tracking-[0.1em] uppercase mt-1">Nota Média</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 7-Day Guarantee before CTA */}
+              <div className="mb-5 sm:mb-6 p-4 sm:p-5 rounded-[var(--radius)] bg-[var(--surface)] border border-[rgba(90,173,110,0.2)] flex items-start gap-3 sm:gap-4">
+                <IconShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--success)] shrink-0" />
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base mb-1 text-[var(--success)]">Garantia de 7 Dias</h4>
+                  <p className="text-[var(--text-secondary)] text-xs sm:text-sm leading-relaxed">
+                    Teste sem risco. Se na primeira semana você não sentir que economizou tempo e encontrou filmes melhores, devolvemos 100% do seu dinheiro. Sem perguntas, sem burocracia.
+                  </p>
+                </div>
+              </div>
+
               <button
                 onClick={() => setStep('signup')}
                 className="cta-gold w-full py-4 sm:py-5 text-base sm:text-xl"
               >
                 Desbloquear Meu Perfil Completo
               </button>
+              <p className="text-center text-[var(--text-muted)] text-xs mt-3">
+                Junte-se a mais de 2.000 cinéfilos que já pararam de perder tempo escolhendo filme
+              </p>
             </div>
           )}
 
