@@ -219,20 +219,12 @@ export default function HorrorGame() {
           </div>
 
           <div className="w-full max-w-md mb-5 sm:mb-6 p-4 rounded-[var(--radius)] bg-[var(--surface)] text-left" style={{ border: '1px solid var(--border)' }}>
-            <div className="font-mono text-[0.68rem] text-[var(--success)] tracking-[0.15em] uppercase mb-2">Impacto no seu bolso</div>
-            <div className="flex items-end justify-between mb-3">
-              <div>
-                <p className="text-xs text-[var(--text-secondary)] mb-0.5">Streamings atuais</p>
-                <p className="font-display text-lg font-light text-[var(--text)]">~R$ 100/mês</p>
-              </div>
-              <div className="text-[var(--text-muted)] mb-1">vs</div>
-              <div className="text-right">
-                <p className="text-xs text-[var(--text-secondary)] mb-0.5">MrCine PRO</p>
-                <p className="font-display text-lg font-light" style={{ color: 'var(--success)' }}>R$ 9/mês</p>
-              </div>
-            </div>
-            <p className="text-[var(--text-secondary)] text-xs">
-              <strong className="text-[var(--success)]">Menos de 10%</strong> do custo pra resolver o problema que nenhum streaming resolve.
+            <div className="font-mono text-[0.68rem] text-[var(--accent)] tracking-[0.15em] uppercase mb-2">O valor real</div>
+            <p className="text-[var(--text-secondary)] text-xs leading-relaxed mb-2">
+              Você já paga ~R$ 100/mês em streamings. Mas ainda perde 40min decidindo o que assistir.
+            </p>
+            <p className="text-[var(--text-secondary)] text-xs leading-relaxed">
+              MrCine PRO é a <strong className="text-[var(--text)]">inteligência</strong> que faltava. R$ 9/mês pra finalmente aproveitar o que você já paga.
             </p>
           </div>
 

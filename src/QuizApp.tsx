@@ -979,29 +979,14 @@ export default function QuizApp() {
                 </div>
               </div>
 
-              {/* Cost Comparison */}
+              {/* Value Proposition */}
               <div className="mb-6 sm:mb-8 p-4 sm:p-5 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--border)]">
-                <div className="font-mono text-[0.68rem] text-[var(--success)] tracking-[0.15em] uppercase mb-3">Comparação de custo</div>
-                <div className="flex items-end justify-between mb-3">
-                  <div>
-                    <p className="text-sm text-[var(--text-secondary)] mb-0.5">Seus streamings atuais</p>
-                    <p className="font-display text-xl sm:text-2xl font-light text-[var(--text)]">
-                      ~R$ 100<span className="text-[var(--text-muted)] text-lg">/mês</span>
-                    </p>
-                  </div>
-                  <div className="text-[var(--text-muted)] text-2xl mb-1">vs</div>
-                  <div className="text-right">
-                    <p className="text-sm text-[var(--text-secondary)] mb-0.5">MrCine PRO</p>
-                    <p className="font-display text-xl sm:text-2xl font-light" style={{ color: 'var(--success)' }}>
-                      R$ 9<span className="text-[var(--text-muted)] text-lg">/mês</span>
-                    </p>
-                  </div>
-                </div>
-                <div className="h-2 w-full bg-[var(--surface-3)] rounded-full overflow-hidden mb-2">
-                  <div className="h-full w-[9%] rounded-full" style={{ background: 'linear-gradient(90deg, var(--success), #7dd48e)', boxShadow: '0 0 10px rgba(90,173,110,0.3)' }} />
-                </div>
-                <p className="text-[var(--text-secondary)] text-xs">
-                  Por <strong className="text-[var(--success)]">menos de 10%</strong> do custo dos seus streamings, você resolve o problema que nenhum deles resolve: <em>o que assistir</em>.
+                <div className="font-mono text-[0.68rem] text-[var(--accent)] tracking-[0.15em] uppercase mb-3">O valor real</div>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-3">
+                  Você já investe <strong className="text-[var(--text)]">~R$ 100/mês</strong> em streamings. Mas ainda perde <strong className="text-[var(--text)]">40 minutos por sessão</strong> só decidindo o que assistir.
+                </p>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                  O MrCine PRO é a <strong className="text-[var(--text)]">camada de inteligência</strong> que faltava. Por <strong className="text-[var(--accent)]">R$ 9/mês</strong>, você finalmente aproveita 100% do que já paga — sem rolar catálogo, sem frustração, sem desistir e dormir.
                 </p>
               </div>
 
