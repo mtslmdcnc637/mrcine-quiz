@@ -46,9 +46,9 @@ function IconTv(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 
 function IconCoffee(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>}
 function IconTrendingUp(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>}
 
-import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS, PRICING_PLANS } from './config/quizData';
-import { toast } from './lib/toast';
-import { getReferralCode } from './lib/referral';
+import { QUIZ_PHASES, QUIZ_QUESTIONS, LOADING_TEXTS, RESULT_BENEFITS } from './config/quizData';
+import SignupScreen from './shared/SignupScreen';
+import PricingScreen from './shared/PricingScreen';
 
 // Deferred lazy imports
 let _supabasePromise: Promise<any> | null = null;
@@ -468,13 +468,8 @@ export default function QuizApp() {
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
-  const [selectedPlan, setSelectedPlan] = useState('quarterly');
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [signupPassword, setSignupPassword] = useState('');
-  const [isSigningUp, setIsSigningUp] = useState(false);
   const [profileResult, setProfileResult] = useState<CinematographicProfile | null>(null);
   const [profileMovies, setProfileMovies] = useState<any[]>([]);
-  const [urgencySlots, setUrgencySlots] = useState(23);
 
   const handleStart = () => setStep('question');
   const handleAnswer = (questionId: string, value: any) => setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -503,79 +498,6 @@ export default function QuizApp() {
         setTimeout(() => setStep('result'), 500);
       }
     }, 60);
-  };
-
-  const handleSignUp = async () => {
-    if (!answers.email) { toast.error('E-mail não encontrado. Refaça o quiz.'); return; }
-    if (signupPassword.length < 6) { toast.error('A senha deve ter pelo menos 6 caracteres.'); return; }
-    setIsSigningUp(true);
-    try {
-      const supabase = await getSupabase();
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: answers.email, password: signupPassword,
-        options: { data: { username: answers.name || 'Usuário' } }
-      });
-      if (signUpError) throw signUpError;
-      if (signUpData.user) {
-        await supabase.from('profiles').upsert(
-          { id: signUpData.user.id, username: answers.name || 'Usuário', xp: 0, level: 1 },
-          { onConflict: 'id', ignoreDuplicates: true }
-        );
-      }
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        toast.success('Conta criada com sucesso!');
-        setStep('pricing');
-      } else {
-        try {
-          await supabase.auth.signInWithPassword({ email: answers.email, password: signupPassword });
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          const { data: { session: retrySession } } = await supabase.auth.getSession();
-          if (retrySession) { toast.success('Login realizado!'); setStep('pricing'); }
-          else { toast.error('Não foi possível fazer login. Tente novamente.'); }
-        } catch {
-          toast.error('Este e-mail já está cadastrado com outra senha. Faça login manualmente.');
-          window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
-        }
-      }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao criar conta';
-      toast.error(message);
-    } finally { setIsSigningUp(false); }
-  };
-
-  const handleSubscribe = async (planId: string) => {
-    setIsSubscribing(true);
-    try {
-      const ttq = (window as any).ttq;
-      if (ttq && typeof ttq.track === 'function') {
-        ttq.track('InitiateCheckout');
-      }
-    } catch {}
-    try {
-      const [supabase, invokeEdgeFunction] = await Promise.all([getSupabase(), getEdgeFunction()]);
-      try { await supabase.auth.refreshSession(); } catch { /* ignore */ }
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error('Sessão expirada. Faça login novamente.');
-        window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
-        return;
-      }
-      const data = (await invokeEdgeFunction('stripe-checkout', {
-        plan_id: planId, user_id: session.user.id,
-        user_email: session.user.email || answers.email,
-        ref_code: getReferralCode() || undefined,
-      })) as { url?: string };
-      if (data?.url) { window.location.href = data.url; }
-      else { throw new Error('URL de checkout não retornada'); }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao processar assinatura';
-      if (message.includes('401') || message.includes('Authentication failed') || message.includes('Session expired')) {
-        toast.error('Sessão expirada. Faça login novamente.');
-        window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
-      } else { toast.error(message); }
-    } finally { setIsSubscribing(false); }
   };
 
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
@@ -607,21 +529,6 @@ export default function QuizApp() {
     setWhatsappDisplay(formatted);
     handleAnswer('whatsapp', digits.length > 0 ? digits : '');
   };
-
-  // Urgency counter — decreases gradually to simulate real demand
-  useEffect(() => {
-    if (step !== 'pricing') return;
-    setUrgencySlots(23);
-    const timer = setTimeout(function scheduleDecrease() {
-      setUrgencySlots(prev => {
-        if (prev <= 3) return prev;
-        return prev - 1;
-      });
-      const nextDelay = 30000 + Math.floor(Math.random() * 45000);
-      setTimeout(scheduleDecrease, nextDelay);
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, [step]);
 
   // Get current phase label
   const currentPhase = QUIZ_PHASES.find(p => p.id === currentQuestion?.phase);
@@ -1055,135 +962,17 @@ export default function QuizApp() {
 
           {/* SIGNUP SCREEN */}
           {step === 'signup' && (
-            <div key="signup" className="animate-fade-in-up flex-1 flex flex-col items-center justify-center text-center pb-6 sm:pb-10">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-br from-[var(--accent)] to-[#c49a3e] flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_40px_var(--accent-glow)] mb-4 sm:mb-6">
-                <IconLock className="w-7 h-7 sm:w-9 sm:h-9 text-[var(--bg)]" />
-              </div>
-
-              <h2 className="font-display text-xl sm:text-3xl font-light mb-2">Crie sua conta</h2>
-              <p className="text-[var(--text-secondary)] text-sm sm:text-base mb-6 sm:mb-8 max-w-md">
-                Quase lá! Crie uma senha para acessar seu perfil cinematográfico completo, dicas diárias de filmes e muito mais.
-              </p>
-
-              <div className="w-full max-w-sm space-y-4 text-left">
-                <div>
-                  <label className="text-xs sm:text-sm text-[var(--text-muted)] mb-1 block font-mono tracking-wider uppercase">E-mail</label>
-                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-3 sm:py-4 px-4 sm:px-5 text-[var(--text)] text-base sm:text-lg opacity-60 cursor-not-allowed" autocomplete="email" aria-label="E-mail" />
-                </div>
-                <div>
-                  <label className="text-xs sm:text-sm text-[var(--text-muted)] mb-1 block font-mono tracking-wider uppercase">Crie sua senha</label>
-                  <input
-                    type="password" placeholder="Mínimo 6 caracteres" value={signupPassword}
-                    onChange={(e) => setSignupPassword((e.target as HTMLInputElement).value)}
-                    className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-3 sm:py-4 px-4 sm:px-5 text-[var(--text)] text-base sm:text-lg placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
-                    autoFocus minlength={6}
-                    autocomplete="new-password"
-                    aria-label="Crie sua senha"
-                    onKeyDown={(e) => { if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp(); }}
-                  />
-                </div>
-                <button
-                  onClick={handleSignUp}
-                  disabled={isSigningUp || signupPassword.length < 6}
-                  className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg ${isSigningUp || signupPassword.length < 6 ? 'opacity-50 cursor-not-allowed !transform-none !shadow-none' : ''}`}
-                >
-                  {isSigningUp ? (
-                    <>
-                      <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                      Criando conta...
-                    </>
-                  ) : (
-                    <>Criar Conta e Continuar <IconArrowRight className="w-5 h-5" /></>
-                  )}
-                </button>
-              </div>
-              <p className="mt-6 sm:mt-8 text-[var(--text-muted)] text-xs max-w-xs">
-                Seus dados estão seguros conosco. Criamos essa conta para que você possa acessar seu perfil a qualquer momento.
-              </p>
-              <button
-                onClick={() => setStep('result')}
-                className="mt-4 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
-                aria-label="Voltar para resultados"
-              >
-                ← Voltar aos resultados
-              </button>
-            </div>
+            <SignupScreen
+              email={answers.email || ''}
+              name={answers.name}
+              onSuccess={() => setStep('pricing')}
+              onBack={() => setStep('result')}
+            />
           )}
 
           {/* PRICING SCREEN */}
           {step === 'pricing' && (
-            <div key="pricing" className="animate-fade-in-up flex-1 flex flex-col pb-6 sm:pb-10">
-              <div className="text-center mb-6 sm:mb-8">
-                <h2 className="font-display text-xl sm:text-3xl font-light mb-3 sm:mb-4">Escolha seu acesso Pro</h2>
-                <div className="inline-flex items-center gap-2 bg-[var(--accent-dim)] border border-[rgba(212,168,83,0.2)] text-[var(--accent)] px-4 py-2 rounded-full font-mono text-xs sm:text-sm tracking-[0.1em] uppercase">
-                  <IconCrown className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
-                  Preço de lançamento — vagas limitadas
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:gap-4 mb-6 sm:mb-8">
-                {PRICING_PLANS.map(plan => (
-                  <div
-                    key={plan.id}
-                    onClick={() => setSelectedPlan(plan.id)}
-                    className={`relative p-4 sm:p-6 rounded-[var(--radius)] border cursor-pointer transition-all ${
-                      selectedPlan === plan.id
-                        ? 'bg-[var(--accent-dim)] border-[var(--accent)]'
-                        : 'bg-[var(--surface)] border-[var(--border)] hover:border-[rgba(212,168,83,0.3)]'
-                    }`}
-                  >
-                    {plan.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--accent)] to-[#c49a3e] text-[var(--bg)] text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                        Mais Popular
-                      </div>
-                    )}
-                    <div className="flex justify-between items-center pr-8 sm:pr-10">
-                      <div>
-                        <h3 className="text-base sm:text-xl font-bold mb-0.5 sm:mb-1">{plan.name}</h3>
-                        {plan.savings && <span className="text-[var(--success)] text-xs sm:text-sm font-medium">{plan.savings}</span>}
-                      </div>
-                      <div className="text-right">
-                        <div className="font-display text-lg sm:text-2xl font-semibold text-[var(--accent)]">{plan.price}</div>
-                        <div className="text-[var(--text-muted)] text-xs sm:text-sm">{plan.period}</div>
-                      </div>
-                    </div>
-                    <div className={`absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      selectedPlan === plan.id ? 'border-[var(--accent)] bg-[var(--accent)]' : 'border-[var(--text-muted)]'
-                    }`}>
-                      {selectedPlan === plan.id && <div className="w-2 h-2 rounded-full bg-[var(--bg)]" />}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                onClick={() => handleSubscribe(selectedPlan)}
-                disabled={isSubscribing}
-                className={`cta-gold w-full py-4 sm:py-5 text-base sm:text-xl mb-3 sm:mb-4 ${isSubscribing ? 'opacity-50 cursor-not-allowed !transform-none !shadow-none' : ''}`}
-              >
-                {isSubscribing ? 'Processando...' : 'Assinar Agora'}
-              </button>
-
-              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] p-4 sm:p-5 flex items-start gap-3 sm:gap-4">
-                <IconShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--success)] shrink-0" />
-                <div>
-                  <h4 className="font-bold text-sm sm:text-base mb-1">Garantia de 7 Dias</h4>
-                  <p className="text-[var(--text-secondary)] text-xs sm:text-sm">
-                    Se você não sentir que economizou tempo e encontrou filmes melhores na primeira semana, devolvemos 100% do seu dinheiro. Sem perguntas.
-                  </p>
-                </div>
-              </div>
-
-              {/* Urgency Bar */}
-              <div className="urgency-bar mt-5">
-                <span className="urgency-dot" />
-                Oferta de lançamento — <strong>{urgencySlots} {urgencySlots === 1 ? 'vaga' : 'vagas'}</strong> restantes com esse preço
-              </div>
-
-              <div className="mt-4 sm:mt-6 flex justify-center items-center gap-2 text-[var(--text-muted)] text-xs sm:text-sm">
-                <IconLock className="w-3 h-3 sm:w-4 sm:h-4" /> Pagamento 100% Seguro via Stripe
-              </div>
-            </div>
+            <PricingScreen email={answers.email || ''} />
           )}
       </div>
     </div>

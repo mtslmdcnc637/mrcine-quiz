@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
-    "preact": "^10.29.1"
+    "preact": "^10.29.1",
+    "wouter-preact": "^3.9.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.5",
