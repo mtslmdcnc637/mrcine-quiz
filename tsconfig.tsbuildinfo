@@ -1,1 +1,0 @@
-{"root":["./src/QuizApp.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/config/quizData.ts","./src/lib/edgeFunction.ts","./src/lib/referral.ts","./src/lib/supabase.ts","./src/lib/toast.ts"],"version":"5.9.3"}

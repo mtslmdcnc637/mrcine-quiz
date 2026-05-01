@@ -1,4 +1,31 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
+import { Component } from 'preact';
+
+// Error Boundary — evita tela branca em caso de exceção
+class ErrorBoundary extends Component<{ children: any }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  componentDidCatch(error: Error) {
+    this.setState({ error });
+    console.error('Quiz error:', error);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex items-center justify-center">
+          <div className="text-center p-8 max-w-sm">
+            <div className="font-display text-3xl sm:text-4xl mb-4">😔</div>
+            <h2 className="font-display text-xl sm:text-2xl font-light mb-2">Algo deu errado</h2>
+            <p className="text-[var(--text-secondary)] text-sm mb-6">Um erro inesperado ocorreu. Isso pode ser temporário.</p>
+            <button onClick={() => window.location.reload()} className="cta-gold text-sm px-6 py-3">
+              Tentar novamente
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Inline SVG icons — replaces lucide-react (~38KB savings)
 function IconFilm(p:any){return<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="7" x2="7" y1="3" y2="21"/><line x1="17" x2="17" y1="3" y2="21"/><line x1="3" x2="7" y1="8" y2="8"/><line x1="17" x2="21" y1="8" y2="8"/><line x1="3" x2="7" y1="16" y2="16"/><line x1="17" x2="21" y1="16" y2="16"/></svg>}
@@ -298,31 +325,36 @@ function ScoreRing({ score }: { score: number }) {
     const circumference = 2 * Math.PI * 80;
     const offset = circumference - (score / 100 * circumference);
 
-    // Delay ring animation slightly
+    let cancelled = false;
+    let animId = 0;
+    let verdictId: any = 0;
+
     const timer = setTimeout(() => {
-      if (fillRef.current) {
-        fillRef.current.style.strokeDashoffset = String(offset);
-        if (score > 60) fillRef.current.classList.add('good');
-        else if (score > 40) fillRef.current.classList.add('warn');
-      }
+      if (cancelled || !fillRef.current) return;
+      fillRef.current.style.strokeDashoffset = String(offset);
+      if (score > 60) fillRef.current.classList.add('good');
+      else if (score > 40) fillRef.current.classList.add('warn');
     }, 800);
 
-    // Animate number
     const start = performance.now() + 800;
     const duration = 1800;
     function tick(now: number) {
+      if (cancelled) return;
       const t = Math.min((now - start) / duration, 1);
-      if (t < 0) { requestAnimationFrame(tick); return; }
+      if (t < 0) { animId = requestAnimationFrame(tick); return; }
       const eased = 1 - Math.pow(1 - t, 3);
       setAnimatedScore(Math.round(eased * score));
-      if (t < 1) requestAnimationFrame(tick);
-      else {
-        setTimeout(() => setShowVerdict(true), 200);
-      }
+      if (t < 1) { animId = requestAnimationFrame(tick); }
+      else { verdictId = setTimeout(() => !cancelled && setShowVerdict(true), 200); }
     }
-    requestAnimationFrame(tick);
+    animId = requestAnimationFrame(tick);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      clearTimeout(verdictId);
+      cancelAnimationFrame(animId);
+    };
   }, [score]);
 
   const verdict = score < 40 ? 'Abaixo do ideal' : score < 60 ? 'Precisa melhorar' : 'Bom, mas pode melhorar';
@@ -415,6 +447,7 @@ function Particles() {
 
 type QuizStep = 'start' | 'question' | 'loading' | 'result' | 'signup' | 'pricing';
 
+export { ErrorBoundary };
 export default function QuizApp() {
   const [step, setStep] = useState<QuizStep>('start');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -470,7 +503,10 @@ export default function QuizApp() {
       });
       if (signUpError) throw signUpError;
       if (signUpData.user) {
-        await supabase.from('profiles').upsert({ id: signUpData.user.id, username: answers.name || 'Usuário', xp: 0, level: 1 });
+        await supabase.from('profiles').upsert(
+          { id: signUpData.user.id, username: answers.name || 'Usuário', xp: 0, level: 1 },
+          { onConflict: 'id', ignoreDuplicates: true }
+        );
       }
       await new Promise(resolve => setTimeout(resolve, 1500));
       const { data: { session } } = await supabase.auth.getSession();
@@ -510,7 +546,7 @@ export default function QuizApp() {
       if (!session) {
         toast.error('Sessão expirada. Faça login novamente.');
         window.location.href = 'https://mrcine.pro/login?redirect=/pricing';
-        setIsSubscribing(false); return;
+        return;
       }
       const data = (await invokeEdgeFunction('stripe-checkout', {
         plan_id: planId, user_id: session.user.id,
@@ -541,7 +577,8 @@ export default function QuizApp() {
         return !isValidEmail(currentAnswer);
       }
       if (currentQuestion.id === 'whatsapp') {
-        if (!currentAnswer || currentAnswer.replace(/\D/g, '').length === 0) return true;
+        const digits = (currentAnswer || '').replace(/\D/g, '');
+        if (digits.length === 0) return false; // campo opcional
         return !formatWhatsApp(currentAnswer).isValid;
       }
       // name and other text inputs — allow after 2+ characters
@@ -557,16 +594,19 @@ export default function QuizApp() {
     handleAnswer('whatsapp', digits.length > 0 ? digits : '');
   };
 
-  // Urgency counter
+  // Urgency counter — decreases gradually to simulate real demand
   useEffect(() => {
     if (step !== 'pricing') return;
-    const interval = setInterval(() => {
+    setUrgencySlots(23);
+    const timer = setTimeout(function scheduleDecrease() {
       setUrgencySlots(prev => {
-        if (prev > 4 && Math.random() > 0.6) return prev - 1;
-        return prev;
+        if (prev <= 3) return prev;
+        return prev - 1;
       });
-    }, 15000 + Math.random() * 20000);
-    return () => clearInterval(interval);
+      const nextDelay = 30000 + Math.floor(Math.random() * 45000);
+      setTimeout(scheduleDecrease, nextDelay);
+    }, 10000);
+    return () => clearTimeout(timer);
   }, [step]);
 
   // Get current phase label
@@ -647,7 +687,7 @@ export default function QuizApp() {
                 <p className="text-xs sm:text-sm text-[var(--text-muted)] uppercase tracking-wider font-bold mb-3 sm:mb-4 text-center">O que dizem nossos usuários</p>
                 <div className="bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 rounded-[var(--radius)] mb-3 sm:mb-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <img src="/avatar-mariana.png" alt="Mariana S." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
+                    <img src="/avatar-mariana.png" alt="Mariana S." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" onError={(e) => { const img = e.currentTarget; img.outerHTML = `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--accent-dim)] flex items-center justify-center text-[var(--accent)] font-bold text-xs">${img.alt.charAt(0)}</div>`; }} />
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-[var(--text)]">Mariana S.</p>
                       <div className="flex text-[var(--accent)]">
@@ -660,7 +700,7 @@ export default function QuizApp() {
 
                 <div className="bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 rounded-[var(--radius)] mb-3 sm:mb-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <img src="/avatar-rafael.jpeg" alt="Camila R." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
+                    <img src="/avatar-rafael.jpeg" alt="Camila R." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" onError={(e) => { const img = e.currentTarget; img.outerHTML = `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--accent-dim)] flex items-center justify-center text-[var(--accent)] font-bold text-xs">${img.alt.charAt(0)}</div>`; }} />
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-[var(--text)]">Camila R.</p>
                       <div className="flex text-[var(--accent)]">
@@ -673,7 +713,7 @@ export default function QuizApp() {
 
                 <div className="bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 rounded-[var(--radius)]">
                   <div className="flex items-center gap-3 mb-2">
-                    <img src="/avatar-lucas.png" alt="Lucas M." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" />
+                    <img src="/avatar-lucas.png" alt="Lucas M." className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" loading="lazy" onError={(e) => { const img = e.currentTarget; img.outerHTML = `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--accent-dim)] flex items-center justify-center text-[var(--accent)] font-bold text-xs">${img.alt.charAt(0)}</div>`; }} />
                     <div>
                       <p className="font-bold text-xs sm:text-sm text-[var(--text)]">Lucas M.</p>
                       <div className="flex text-[var(--accent)]">
@@ -709,7 +749,7 @@ export default function QuizApp() {
                     </span>
                   ))}
                 </div>
-                <div className="h-1 w-full bg-[var(--surface-3)] rounded-full overflow-hidden">
+                <div className="h-1 w-full bg-[var(--surface-3)] rounded-full overflow-hidden" role="progressbar" aria-valuenow={((currentQuestionIndex + 1) / QUIZ_QUESTIONS.length) * 100} aria-valuemin={0} aria-valuemax={100} aria-label="Progresso do quiz">
                   <div
                     className="h-full transition-all duration-500 rounded-full"
                     style={{
@@ -752,6 +792,8 @@ export default function QuizApp() {
                           onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNextQuestion(); }}
                           className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-4 sm:py-5 pl-12 pr-6 text-lg sm:text-xl text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
                           autoFocus
+                          autocomplete="tel"
+                          aria-label="WhatsApp"
                         />
                         {answers.whatsapp && answers.whatsapp.length > 0 && !formatWhatsApp(answers.whatsapp).isValid && (
                           <p className="text-[var(--accent)] text-xs mt-2 ml-1">Digite um número válido: DDD + 9 + 8 dígitos</p>
@@ -768,6 +810,8 @@ export default function QuizApp() {
                           value={currentAnswer || ''}
                           onChange={(e) => handleAnswer(currentQuestion.id, (e.target as HTMLInputElement).value)}
                           onKeyDown={(e) => { if (e.key === 'Enter' && !isNextDisabled()) handleNextQuestion(); }}
+                          autocomplete={currentQuestion.id === 'email' ? 'email' : currentQuestion.id === 'name' ? 'name' : 'off'}
+                          aria-label={currentQuestion.id}
                           className={`w-full bg-[var(--surface-2)] border rounded-[var(--radius-sm)] py-4 sm:py-5 px-6 text-lg sm:text-xl text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none transition-all ${
                             currentQuestion.id === 'email' && currentAnswer
                               ? isValidEmail(currentAnswer)
@@ -832,6 +876,15 @@ export default function QuizApp() {
                     >
                       Continuar
                     </button>
+                    {currentQuestionIndex > 0 && (
+                      <button
+                        onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
+                        className="w-full mt-3 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
+                        aria-label="Voltar para pergunta anterior"
+                      >
+                        ← Voltar
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -1001,7 +1054,7 @@ export default function QuizApp() {
               <div className="w-full max-w-sm space-y-4 text-left">
                 <div>
                   <label className="text-xs sm:text-sm text-[var(--text-muted)] mb-1 block font-mono tracking-wider uppercase">E-mail</label>
-                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-3 sm:py-4 px-4 sm:px-5 text-[var(--text)] text-base sm:text-lg opacity-60 cursor-not-allowed" />
+                  <input type="email" value={answers.email || ''} readOnly className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-3 sm:py-4 px-4 sm:px-5 text-[var(--text)] text-base sm:text-lg opacity-60 cursor-not-allowed" autocomplete="email" aria-label="E-mail" />
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm text-[var(--text-muted)] mb-1 block font-mono tracking-wider uppercase">Crie sua senha</label>
@@ -1009,7 +1062,9 @@ export default function QuizApp() {
                     type="password" placeholder="Mínimo 6 caracteres" value={signupPassword}
                     onChange={(e) => setSignupPassword((e.target as HTMLInputElement).value)}
                     className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-[var(--radius-sm)] py-3 sm:py-4 px-4 sm:px-5 text-[var(--text)] text-base sm:text-lg placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
-                    autoFocus minLength={6}
+                    autoFocus minlength={6}
+                    autocomplete="new-password"
+                    aria-label="Crie sua senha"
                     onKeyDown={(e) => { if (e.key === 'Enter' && signupPassword.length >= 6) handleSignUp(); }}
                   />
                 </div>
@@ -1031,6 +1086,13 @@ export default function QuizApp() {
               <p className="mt-6 sm:mt-8 text-[var(--text-muted)] text-xs max-w-xs">
                 Seus dados estão seguros conosco. Criamos essa conta para que você possa acessar seu perfil a qualquer momento.
               </p>
+              <button
+                onClick={() => setStep('result')}
+                className="mt-4 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
+                aria-label="Voltar para resultados"
+              >
+                ← Voltar aos resultados
+              </button>
             </div>
           )}
 
@@ -1061,7 +1123,7 @@ export default function QuizApp() {
                         Mais Popular
                       </div>
                     )}
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center pr-8 sm:pr-10">
                       <div>
                         <h3 className="text-base sm:text-xl font-bold mb-0.5 sm:mb-1">{plan.name}</h3>
                         {plan.savings && <span className="text-[var(--success)] text-xs sm:text-sm font-medium">{plan.savings}</span>}

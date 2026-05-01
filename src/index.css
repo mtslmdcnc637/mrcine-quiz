@@ -161,8 +161,8 @@ body::after {
 }
 .score-ring .fill {
   stroke: var(--danger);
-  stroke-dasharray: 502;
-  stroke-dashoffset: 502;
+  stroke-dasharray: 503;
+  stroke-dashoffset: 503;
   transition: stroke-dashoffset 2s var(--ease);
 }
 .score-ring .fill.warn {

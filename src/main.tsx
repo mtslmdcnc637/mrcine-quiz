@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import QuizApp from './QuizApp';
+import QuizApp, { ErrorBoundary } from './QuizApp';
 import { captureReferral } from './lib/referral';
 import './index.css';
 
@@ -14,4 +14,4 @@ if ('requestIdleCallback' in window) {
 const shell = document.getElementById('app-shell');
 if (shell) shell.remove();
 
-render(<QuizApp />, document.getElementById('root')!);
+render(<ErrorBoundary><QuizApp /></ErrorBoundary>, document.getElementById('root')!);

@@ -234,8 +234,7 @@ export const QUIZ_QUESTIONS = [
     title: 'Qual seu WhatsApp?',
     subtitle: 'Opcional. Enviaremos novidades e dicas de filmes por lá.',
     type: 'input',
-    placeholder: '(11) 99999-9999',
-    inputType: 'tel'
+    placeholder: '(11) 99999-9999'
   }
 ];
 
