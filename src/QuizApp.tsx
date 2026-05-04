@@ -656,6 +656,11 @@ export default function QuizApp() {
                   Começar Agora <IconArrowRight className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Disclaimer - não somos pirataria */}
+              <p className="mt-6 sm:mt-8 text-[10px] sm:text-xs text-[var(--text-muted)] text-center max-w-sm leading-relaxed">
+                O MrCine é uma plataforma de recomendação de filmes por IA. Não hospedamos, transmitimos ou baixamos filmes. Apenas ajudamos você a descobrir o filme perfeito para o seu momento.
+              </p>
             </div>
           )}
 
