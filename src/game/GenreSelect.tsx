@@ -29,6 +29,7 @@ export default function GenreSelect() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 flex-1 items-start">
           <button
             onClick={() => navigate('/game-action')}
+            onTouchEnd={(e) => { e.preventDefault(); navigate('/game-action'); }}
             className="group relative overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] hover:border-[rgba(212,168,83,0.4)] transition-all duration-300 cursor-pointer text-left flex flex-col items-center p-5 sm:p-8"
           >
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(ellipse at center, rgba(212,168,83,0.1), transparent 70%)' }} />
@@ -46,6 +47,7 @@ export default function GenreSelect() {
 
           <button
             onClick={() => navigate('/game-horror')}
+            onTouchEnd={(e) => { e.preventDefault(); navigate('/game-horror'); }}
             className="group relative overflow-hidden rounded-[var(--radius)] border border-[rgba(204,51,51,0.15)] bg-[var(--surface)] hover:border-[rgba(204,51,51,0.5)] transition-all duration-300 cursor-pointer text-left flex flex-col items-center p-5 sm:p-8"
           >
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(ellipse at center, rgba(204,51,51,0.08), transparent 70%)' }} />

@@ -114,10 +114,10 @@ export default function ActionGame() {
               onComplete={() => {}}
             />
           </div>
-          <button onClick={() => setScreen('questions')} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
+          <button onClick={() => setScreen('questions')} onTouchEnd={(e) => { e.preventDefault(); setScreen('questions'); }} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
             Iniciar Missão <IconArrowRight className="w-5 h-5" />
           </button>
-          <button onClick={() => navigate('/game')} className="mt-3 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
+          <button onClick={() => navigate('/game')} onTouchEnd={(e) => { e.preventDefault(); navigate('/game'); }} className="mt-3 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
             ← Voltar
           </button>
         </div>
@@ -214,7 +214,7 @@ export default function ActionGame() {
             </p>
           </div>
 
-          <button onClick={() => setScreen('signup')} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
+          <button onClick={() => setScreen('signup')} onTouchEnd={(e) => { e.preventDefault(); setScreen('signup'); }} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
             Desbloquear Perfil Tático <IconArrowRight className="w-5 h-5" />
           </button>
           <p className="text-[var(--text-muted)] text-xs mt-3 text-center">+2.000 cinéfilos já pararam de perder tempo escolhendo filme</p>
@@ -315,6 +315,11 @@ export default function ActionGame() {
                         handleAnswer(currentQ.id, option.id);
                         setTimeout(handleNext, 250);
                       }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        handleAnswer(currentQ.id, option.id);
+                        setTimeout(handleNext, 250);
+                      }}
                       className={`option-card w-full text-left ${isSelected ? 'selected' : ''}`}
                     >
                       {Icon && <Icon className={`w-5 h-5 sm:w-6 sm:h-6 relative z-10 shrink-0 ${isSelected ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}`} />}
@@ -333,6 +338,7 @@ export default function ActionGame() {
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-[var(--border)]">
               <button
                 onClick={handleNext}
+                onTouchEnd={(e) => { e.preventDefault(); if (!isNextDisabled()) handleNext(); }}
                 disabled={isNextDisabled()}
                 className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg transition-all duration-300 ${isNextDisabled() ? 'opacity-40 cursor-not-allowed !transform-none !shadow-none !background-none' : 'opacity-100'}`}
               >
@@ -341,6 +347,7 @@ export default function ActionGame() {
               {questionIndex > 0 && (
                 <button
                   onClick={() => setQuestionIndex(prev => prev - 1)}
+                  onTouchEnd={(e) => { e.preventDefault(); setQuestionIndex(prev => prev - 1); }}
                   className="w-full mt-3 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
                   aria-label="Voltar para pergunta anterior"
                 >

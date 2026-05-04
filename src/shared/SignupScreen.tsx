@@ -90,6 +90,7 @@ export default function SignupScreen({ email, name, onSuccess, onBack }: SignupS
         </div>
         <button
           onClick={handleSignUp}
+          onTouchEnd={(e) => { e.preventDefault(); handleSignUp(); }}
           disabled={isSubmitting || password.length < 6}
           className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg ${isSubmitting || password.length < 6 ? 'opacity-50 cursor-not-allowed !transform-none !shadow-none' : ''}`}
         >
@@ -109,6 +110,7 @@ export default function SignupScreen({ email, name, onSuccess, onBack }: SignupS
       {onBack && (
         <button
           onClick={onBack}
+          onTouchEnd={(e) => { e.preventDefault(); onBack && onBack(); }}
           className="mt-4 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
           aria-label="Voltar para resultados"
         >

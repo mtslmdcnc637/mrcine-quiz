@@ -80,6 +80,7 @@ export default function PricingScreen({ email, onBack }: PricingScreenProps) {
           <div
             key={plan.id}
             onClick={() => setSelectedPlan(plan.id)}
+            onTouchEnd={(e) => { e.preventDefault(); setSelectedPlan(plan.id); }}
             className={`relative p-4 sm:p-6 rounded-[var(--radius)] border cursor-pointer transition-all ${
               selectedPlan === plan.id
                 ? 'bg-[var(--accent-dim)] border-[var(--accent)]'
@@ -112,6 +113,7 @@ export default function PricingScreen({ email, onBack }: PricingScreenProps) {
 
       <button
         onClick={() => handleSubscribe(selectedPlan)}
+        onTouchEnd={(e) => { e.preventDefault(); handleSubscribe(selectedPlan); }}
         disabled={isSubscribing}
         className={`cta-gold w-full py-4 sm:py-5 text-base sm:text-xl mb-3 sm:mb-4 ${isSubscribing ? 'opacity-50 cursor-not-allowed !transform-none !shadow-none' : ''}`}
       >

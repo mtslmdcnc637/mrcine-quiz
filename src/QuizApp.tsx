@@ -16,7 +16,7 @@ class ErrorBoundary extends Component<{ children: any }, { error: Error | null }
             <div className="font-display text-3xl sm:text-4xl mb-4">😔</div>
             <h2 className="font-display text-xl sm:text-2xl font-light mb-2">Algo deu errado</h2>
             <p className="text-[var(--text-secondary)] text-sm mb-6">Um erro inesperado ocorreu. Isso pode ser temporário.</p>
-            <button onClick={() => window.location.reload()} className="cta-gold text-sm px-6 py-3">
+            <button onClick={() => window.location.reload()} onTouchEnd={(e) => { e.preventDefault(); window.location.reload(); }} className="cta-gold text-sm px-6 py-3">
               Tentar novamente
             </button>
           </div>
@@ -650,6 +650,7 @@ export default function QuizApp() {
               <div className="mt-6 sm:mt-8 flex flex-col items-center justify-center w-full max-w-sm">
                 <button
                   onClick={handleStart}
+                  onTouchEnd={(e) => { e.preventDefault(); handleStart(); }}
                   className="cta-gold w-full text-base sm:text-lg py-4 sm:py-5"
                 >
                   Começar Agora <IconArrowRight className="w-5 h-5" />
@@ -773,6 +774,19 @@ export default function QuizApp() {
                                 handleAnswer(currentQuestion.id, next);
                               }
                             }}
+                            onTouchEnd={(e) => {
+                              e.preventDefault();
+                              if (currentQuestion.type === 'single') {
+                                handleAnswer(currentQuestion.id, option.id);
+                                setTimeout(handleNextQuestion, 300);
+                              } else {
+                                const curr = currentAnswer || [];
+                                const next = curr.includes(option.id)
+                                  ? curr.filter((id: string) => id !== option.id)
+                                  : [...curr, option.id];
+                                handleAnswer(currentQuestion.id, next);
+                              }
+                            }}
                             className={`option-card w-full text-left ${isSelected ? 'selected' : ''}`}
                           >
                             {Icon && <Icon className={`w-5 h-5 sm:w-6 sm:h-6 relative z-10 shrink-0 ${isSelected ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}`} />}
@@ -792,6 +806,7 @@ export default function QuizApp() {
                   <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-[var(--border)]">
                     <button
                       onClick={handleNextQuestion}
+                      onTouchEnd={(e) => { e.preventDefault(); if (!isNextDisabled()) handleNextQuestion(); }}
                       disabled={isNextDisabled()}
                       className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg transition-all duration-300 ${isNextDisabled() ? 'opacity-40 cursor-not-allowed !transform-none !shadow-none !background-none' : 'opacity-100'}`}
                     >
@@ -800,6 +815,7 @@ export default function QuizApp() {
                     {currentQuestionIndex > 0 && (
                       <button
                         onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
+                        onTouchEnd={(e) => { e.preventDefault(); setCurrentQuestionIndex(prev => prev - 1); }}
                         className="w-full mt-3 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
                         aria-label="Voltar para pergunta anterior"
                       >
@@ -1022,6 +1038,7 @@ export default function QuizApp() {
 
               <button
                 onClick={() => setStep('signup')}
+                onTouchEnd={(e) => { e.preventDefault(); setStep('signup'); }}
                 className="cta-gold w-full py-4 sm:py-5 text-base sm:text-xl"
               >
                 Desbloquear Meu Perfil Completo

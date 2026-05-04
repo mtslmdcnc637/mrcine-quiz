@@ -133,10 +133,10 @@ export default function HorrorGame() {
               onComplete={() => {}}
             />
           </div>
-          <button onClick={() => setScreen('questions')} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
+          <button onClick={() => setScreen('questions')} onTouchEnd={(e) => { e.preventDefault(); setScreen('questions'); }} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
             Encarar o Medo <IconArrowRight className="w-5 h-5" />
           </button>
-          <button onClick={() => navigate('/game')} className="mt-3 text-sm text-[var(--text-muted)] hover:underline transition-colors" style={{ color: accentHorror }} onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#ff6666'} onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = accentHorror}>
+          <button onClick={() => navigate('/game')} onTouchEnd={(e) => { e.preventDefault(); navigate('/game'); }} className="mt-3 text-sm text-[var(--text-muted)] hover:underline transition-colors" style={{ color: accentHorror }} onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#ff6666'} onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = accentHorror}>
             ← Fugir
           </button>
         </div>
@@ -235,7 +235,7 @@ export default function HorrorGame() {
             </p>
           </div>
 
-          <button onClick={() => setScreen('signup')} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
+          <button onClick={() => setScreen('signup')} onTouchEnd={(e) => { e.preventDefault(); setScreen('signup'); }} className="cta-gold w-full max-w-sm py-4 sm:py-5 text-base sm:text-xl">
             Desbloquear Perfil Sombrio <IconArrowRight className="w-5 h-5" />
           </button>
           <p className="text-[var(--text-muted)] text-xs mt-3 text-center">+2.000 cinéfilos já pararam de perder tempo escolhendo filme</p>
@@ -342,6 +342,11 @@ export default function HorrorGame() {
                         handleAnswer(currentQ.id, option.id);
                         setTimeout(handleNext, 250);
                       }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        handleAnswer(currentQ.id, option.id);
+                        setTimeout(handleNext, 250);
+                      }}
                       className={`option-card w-full text-left ${isSelected ? 'selected' : ''}`}
                       style={isSelected ? { borderColor: accentHorror, background: 'rgba(204,51,51,0.08)' } : {}}
                     >
@@ -361,6 +366,7 @@ export default function HorrorGame() {
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-[var(--border)]">
               <button
                 onClick={handleNext}
+                onTouchEnd={(e) => { e.preventDefault(); if (!isNextDisabled()) handleNext(); }}
                 disabled={isNextDisabled()}
                 className={`cta-gold w-full py-3.5 sm:py-4 text-base sm:text-lg transition-all duration-300 ${isNextDisabled() ? 'opacity-40 cursor-not-allowed !transform-none !shadow-none !background-none' : 'opacity-100'}`}
               >
@@ -369,6 +375,7 @@ export default function HorrorGame() {
               {questionIndex > 0 && (
                 <button
                   onClick={() => setQuestionIndex(prev => prev - 1)}
+                  onTouchEnd={(e) => { e.preventDefault(); setQuestionIndex(prev => prev - 1); }}
                   className="w-full mt-3 py-2 text-sm text-[var(--text-muted)] hover:underline transition-colors"
                   style={{ color: accentHorror }}
                   aria-label="Voltar para pergunta anterior"
