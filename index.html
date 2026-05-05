@@ -36,18 +36,21 @@
               Diagnóstico Gratuito
             </div>
             <h1 style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;line-height:1.1;margin-bottom:1rem">
-              Descubra o que está<br>segurando o seu<br><em style="font-style:italic;font-weight:400;background:linear-gradient(135deg,#d4a853,#e8c46e);-webkit-background-clip:text;-webkit-text-fill-color:transparent">potencial cinematográfico</em>
+              Cansado de rolar a Netflix<br>sem saber o que assistir?
             </h1>
             <p style="color:#a09a90;font-size:1rem;line-height:1.7;margin-bottom:2.5rem;max-width:32rem;margin-left:auto;margin-right:auto">
-              Responda a este quiz rápido para gerar um algoritmo 100% focado no seu gosto pessoal.
+              Seu perfil de cinema revela o filme perfeito em segundos.
             </p>
-            <a href="?start=true" style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:18px 40px;border:none;border-radius:10px;background:linear-gradient(135deg,#d4a853 0%,#c49a3e 100%);color:#0a0a0b;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;letter-spacing:0.03em;cursor:pointer;box-shadow:0 0 30px rgba(212,168,83,0.3);text-decoration:none">
-              Começar Agora
-            </a>
-            <p style="margin-top:12px;color:#a09a90;font-size:0.7rem;font-family:'DM Sans',sans-serif">Se não carregar, <a href="?reload=true" style="color:#d4a853">atualize a página</a></p>
+            <button id="start-quiz" style="display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:18px 40px;border:none;border-radius:10px;background:linear-gradient(135deg,#d4a853 0%,#c49a3e 100%);color:#0a0a0b;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;letter-spacing:0.03em;cursor:pointer;box-shadow:0 0 30px rgba(212,168,83,0.3);-webkit-appearance:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation">
+              Começar Agora →
+            </button>
+            <p style="margin-top:28px;color:#5a5650;font-size:0.65rem;font-family:'DM Sans',sans-serif;max-width:24rem;margin-left:auto;margin-right:auto;line-height:1.5">
+              O MrCine é uma plataforma de recomendação de filmes por IA. Não hospedamos, transmitimos ou baixamos filmes. Apenas ajudamos você a descobrir o filme perfeito para o seu momento.
+            </p>
           </div>
         </div>
         <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}</style>
+        <script>document.getElementById('start-quiz').addEventListener('click',function(){window.location.href='?start=true'});document.getElementById('start-quiz').addEventListener('touchend',function(e){e.preventDefault();window.location.href='?start=true'});</script>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
