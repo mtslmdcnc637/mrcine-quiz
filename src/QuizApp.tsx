@@ -471,6 +471,16 @@ export default function QuizApp() {
   const [profileResult, setProfileResult] = useState<CinematographicProfile | null>(null);
   const [profileMovies, setProfileMovies] = useState<any[]>([]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('start') === 'true') {
+      setStep('question');
+    }
+    if (params.get('reload') === 'true') {
+      window.location.replace(window.location.pathname);
+    }
+  }, []);
+
   const handleStart = () => setStep('question');
   const handleAnswer = (questionId: string, value: any) => setAnswers(prev => ({ ...prev, [questionId]: value }));
 
